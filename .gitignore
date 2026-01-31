@@ -1,0 +1,38 @@
+# env
+venv/
+venv_tts/
+__pycache__/
+*.pyc
+
+# logs & caches
+logs/
+*.log
+
+# large outputs
+tts_results*/
+baseline_results/
+extracted_data/
+
+# audio / media
+*.wav
+*.mp3
+*.flac
+
+# archives / large files
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# pdf outputs
+*.pdf
+
+# Models and Checkpoints
+*.safetensors
+*.pt
+*.ckpt
+*.bin
+*.h5
+*.msgpack
+qwen3vl_translation_lora_output/
+GPT-SoVITS/pretrained_models/
