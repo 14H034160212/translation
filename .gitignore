@@ -1,38 +1,57 @@
-# env
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Envs
 venv/
 venv_tts/
-__pycache__/
-*.pyc
+.env
+.venv
 
-# logs & caches
-logs/
-*.log
-
-# large outputs
-tts_results*/
-baseline_results/
+# Data and Models
+data/
 extracted_data/
-
-# audio / media
-*.wav
-*.mp3
-*.flac
-
-# archives / large files
+baseline_results/
+end_to_end_results/
+ablation_f5_results/
+translation/qwen3vl_translation_lora_output/
 *.tar.gz
-*.zip
-*.7z
-*.rar
-
-# pdf outputs
-*.pdf
-
-# Models and Checkpoints
-*.safetensors
-*.pt
+*.mp4
+*.wav
+*.json
 *.ckpt
+*.pth
+*.pt
+*.safetensors
 *.bin
 *.h5
 *.msgpack
-qwen3vl_translation_lora_output/
-GPT-SoVITS/pretrained_models/
+*.onnx
+*.zip
+
+# Specific large directories/files
+GPT-SoVITS/GPT_SoVITS/pretrained_models/
+F5-TTS/src/f5_tts/infer/examples/vocab.txt
+
+# Editor
+.vscode/
+.idea/

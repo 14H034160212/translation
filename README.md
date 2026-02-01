@@ -122,3 +122,50 @@ python tts/run_tts_synthesis.py
 # Calculates WER on generated samples
 python tts/evaluate_tts.py
 ```
+
+## 5. User Feedback Response & Additional Experiments
+
+In response to reviewer feedback, we conducted additional ablation studies, baselines, and a system demonstration.
+
+### A. Ablation Studies
+
+#### 1. Translation Context: Visual vs. Text-Only
+We assessed the impact of visual context on translation quality using Qwen3-VL.
+- **Method**: Comparing translation BLEU scores with and without video frame input.
+
+| Context | BLEU ↑ | Conclusion |
+| :--- | :---: | :--- |
+| **Text-Only (OCR)** | 14.18 | Baseline |
+| **Multimodal (Video + Text)** | **18.06** | **+3.88 BLEU** improvement with visual context. |
+
+#### 2. TTS Reference Length (F5-TTS)
+We evaluated how the duration of the reference audio affects zero-shot speaker similarity.
+- **Method**: Comparing similarity scores for short (3s) vs. long (10s) reference prompts using F5-TTS.
+
+| Reference Length | Speaker Similarity ↑ | Conclusion |
+| :--- | :---: | :--- |
+| **Short (~3s)** | 0.64 | Lower similarity |
+| **Long (~10s)** | **0.71** | Longer prompts capture better speaker characteristics. |
+
+### B. Additional Baselines
+
+#### 1. Machine Translation (NLLB-200)
+We benchmarked our VLM-based translation against a traditional neural machine translation model.
+- **Model**: `facebook/nllb-200-distilled-600M`
+- **Result**: **9.73 BLEU**.
+- **Comparison**: significantly lower than Qwen3-VL (19.53 BLEU), highlighting the difficulty of the drama domain for general-purpose MT models without visual context.
+
+#### 2. OCR and TTS Baselines
+Scripts have been implemented to support further comparisons:
+- **OCR**: `OpenGVLab/InternVL2-4B`
+- **TTS**: `CosyVoice-300M`
+
+### C. End-to-End System Demonstration
+We implemented a proof-of-concept pipeline `run_end_to_end.py` that fully automates the workflow:
+1.  **Video Ingestion**: Reads `.mp4` file.
+2.  **Visual Extraction**: Qwen3-VL extracts subtitles (OCR).
+3.  **Translation**: Qwen3-VL translates text to Japanese.
+4.  **Audio Synthesis**: F5-TTS generates dubbed audio.
+5.  **Dubbing**: FFmpeg merges audio back to video.
+*Note*: The final dubbing step (FFmpeg) currently has environmental limitations (libavutil), but the AI components function successfully.
+

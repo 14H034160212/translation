@@ -1,0 +1,363 @@
+Evaluating 72 files...
+Transcribing speaker1_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人建立請您過目
+WER   : 1.0000
+
+Transcribing speaker1_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 送是集團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker1_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定会查清楚母亲去世的真相
+WER   : 1.0000
+
+Transcribing speaker1_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : マズルス6 Nietzscheラウドカス
+WER   : 2.0000
+
+Transcribing speaker1_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : はい。順番を再見。じゃない、「ス sweeperaction contact intelligestive learner fighter Fighter
+WER   : 7.0000
+
+Transcribing speaker1_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : 次はB Ad 的作品です。
+WER   : 3.0000
+
+Transcribing speaker2_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人簡歷請您過目
+WER   : 1.0000
+
+Transcribing speaker2_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 宋世集團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker2_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker2_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : ライフレッチーキュウル伛術C嘘パオカララララララ
+WER   : 1.0000
+
+Transcribing speaker2_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : 配信石芸来 airplane非常蠻強
+WER   : 2.0000
+
+Transcribing speaker2_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : Give-skill 真相1b1 トップ 紙アイア
+WER   : 4.0000
+
+Transcribing speaker3_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 真是我你简历成功嗎?
+WER   : 1.0000
+
+Transcribing speaker3_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 啊 风生习团啊 年年吉他念 试试对我来说 非诚 重要
+WER   : 6.0000
+
+Transcribing speaker3_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 噢 不是case噢 噢我一定 love our chance crimes Cinnamon皮頭眼issible生氣白独情騰真相
+WER   : 8.0000
+
+Transcribing speaker3_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : アウダーという夢見に進む弱いくるまた見えない
+WER   : 1.0000
+
+Transcribing speaker3_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : 窓 くらいすだけも・・・いつかでも黙rained世界でそうそう
+WER   : 2.0000
+
+Transcribing speaker3_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : only
+WER   : 1.0000
+
+Transcribing speaker4_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人簡理請您過幕
+WER   : 1.0000
+
+Transcribing speaker4_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 宋世吉團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker4_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker4_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : スキュウミリシュースに到着、ランターフェース
+WER   : 1.0000
+
+Transcribing speaker4_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : 信じに行く 私からの影片を結局メッキーここでご覧いただきありがとうございました
+WER   : 2.0000
+
+Transcribing speaker4_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : D.S。Jで死んでくれています。
+WER   : 1.0000
+
+Transcribing speaker5_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人檢例請您過幕
+WER   : 1.0000
+
+Transcribing speaker5_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 宋世集團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker5_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker5_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : テフェスリキュウリュリーシュー、スペイダー、ランガー、カスクソン。
+WER   : 1.0000
+
+Transcribing speaker5_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : ラッキもずっと眺められた中学ハッ
+WER   : 1.0000
+
+Transcribing speaker5_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : podríaを試んで東 LED推曲ビynos
+WER   : 2.0000
+
+Transcribing speaker6_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人檢例,請您過幕
+WER   : 1.0000
+
+Transcribing speaker6_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 宋世集團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker6_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定会查清楚母亲去世的真相
+WER   : 1.0000
+
+Transcribing speaker6_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : また一つがうごう聞きをする god
+WER   : 2.0000
+
+Transcribing speaker6_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : そしたら、ac-go 天接 Mic values ​​mos 먼��彫け声、不arthCounter
+WER   : 6.0000
+
+Transcribing speaker6_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : 目目みの家は来ます滝 智固
+WER   : 2.0000
+
+Transcribing speaker7_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 叫哪擔心的我的醉擔心的呢走吧這是我個人簡�硢告八岁請你果格不要亡
+WER   : 1.0000
+
+Transcribing speaker7_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 射di把棚鱼瘚弄瘚 class我我我我未英俊未英俊我
+WER   : 2.0000
+
+Transcribing speaker7_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 赶紧做话二爷对有会查清楚为他清楚会丢或清楚母亲去试的真相
+WER   : 1.0000
+
+Transcribing speaker7_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : 最高NKTV片 art 尺寸にすぐ見刺ider 教えの唇サラ为の彼行ま clown 60万人その素手に並べてこんでしするこれは
+WER   : 6.0000
+
+Transcribing speaker7_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : 千間� hunters 8クリスエーディー salarymypheypdeesんmekickim Financialtakeb
+WER   : 5.0000
+
+Transcribing speaker7_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : —間違 forces againstility金裕流アーズ
+WER   : 3.0000
+
+Transcribing speaker8_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人檢例請您過目
+WER   : 1.0000
+
+Transcribing speaker8_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 我本送是集团的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker8_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker8_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : フェスキュー旅立書籍刀刮らないグレース
+WER   : 1.0000
+
+Transcribing speaker8_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : お茶事は?どうですか ?幸せなたね?
+WER   : 2.0000
+
+Transcribing speaker8_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : 次の必想と歩いた
+WER   : 1.0000
+
+Transcribing speaker9_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人簡理請您過目
+WER   : 1.0000
+
+Transcribing speaker9_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 送市集團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker9_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker9_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : モール敵道富4 Bay 市明日張り読 playing
+WER   : 4.0000
+
+Transcribing speaker9_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : 撮影人を男の親郷部分にslvに押を敗逢とす
+WER   : 1.0000
+
+Transcribing speaker9_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : GIG as真相 causes behaviors目は
+WER   : 4.0000
+
+Transcribing speaker10_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人檢例請您過目
+WER   : 1.0000
+
+Transcribing speaker10_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 宋世集團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker10_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker10_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : 16履歩、接倒、好覧A4
+WER   : 1.0000
+
+Transcribing speaker10_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : EDborne Still Have New Front Lounge
+WER   : 6.0000
+
+Transcribing speaker10_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : CuteView 真相şekkürも shadcastのね
+WER   : 3.0000
+
+Transcribing speaker11_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 我是我的個人檢例,請您過幕
+WER   : 1.0000
+
+Transcribing speaker11_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 送是集團的面試對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker11_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker11_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : 是非、二、三、四、四、八、三外不錯。俊明歳出われた〇〇第十〇第十〇第七〇第六〇第七作詞をできる yeah音楽音楽スープアドキさんセンプスープブリニーナインバーオンちょっと
+WER   : 2.0000
+
+Transcribing speaker11_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : プロボードファイ让しながらパクプロボ soウオスサーベーソング相角只放 HIVリーが
+WER   : 3.0000
+
+Transcribing speaker11_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : 190jab2USdb
+WER   : 1.0000
+
+Transcribing speaker12_chinese_0.wav...
+Target: 这是我的个人简历，请您过目。
+Got   : 這是我的個人檢例,請您過幕
+WER   : 1.0000
+
+Transcribing speaker12_chinese_1.wav...
+Target: 宋氏集团的面试对我来说非常重要。
+Got   : 送市集團的面試,對我來說非常重要
+WER   : 1.0000
+
+Transcribing speaker12_chinese_2.wav...
+Target: 我一定会查清楚母亲去世的真相。
+Got   : 我一定會查清楚母親去世的真相
+WER   : 1.0000
+
+Transcribing speaker12_japanese_0.wav...
+Target: これは私の履歴書です、どうぞご覧ください。
+Got   : HCキルリーショーあたおうビーラーラー
+WER   : 1.0000
+
+Transcribing speaker12_japanese_1.wav...
+Target: 宋氏グループの面接は私にとって非常に重要です。
+Got   : うまく用意し、リフか<|bg|>
+WER   : 1.0000
+
+Transcribing speaker12_japanese_2.wav...
+Target: 母の死の真相を必ず突き止めます。
+Got   : pull pull snap just get a head
+WER   : 7.0000
+
+--- Final Evaluation ---
+Average WER: 1.9722
