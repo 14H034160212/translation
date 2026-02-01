@@ -1,49 +1,49 @@
-import os
 import torch
+from cosyvoice.api import CosyVoiceTTS
 import torchaudio
-from modelscope import snapshot_download
-from cosyvoice.cli.cosyvoice import CosyVoice
-from cosyvoice.utils.file_utils import load_wav
+import os
+from pathlib import Path
 
-# Configuration
-# This requires installing cosyvoice: pip install cosyvoice-runtime or from source
-# And modelscope
-OUTPUT_DIR = "baseline_results/cosyvoice"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+# Initialize CosyVoice
+# Using the pre-trained model for zero-shot inference
+cosyvoice = CosyVoiceTTS('speech_tts/CosyVoice-300M')
 
 def main():
-    print("Loading CosyVoice-300M...")
-    # This will download the model to cache
-    # "speech_tts/CosyVoice-300M" is the model id in modelscope
-    try:
-        cosyvoice = CosyVoice('speech_tts/CosyVoice-300M')
-    except Exception as e:
-        print(f"Failed to load CosyVoice: {e}")
-        print("Please ensure 'modelscope' and 'cosyvoice' are installed.")
-        return
-
-    # Test Text
-    target_text = "こんにちは、これはテストです。"
+    # Load test data same as other TTS experiments
+    # For baseline, we just hardcode the few examples or read from a file if needed
+    # Here we demonstrate with the standard test set logic if applicable, 
+    # but for "baseline" quick replacement, we will use a demo set.
     
-    # Reference Audio (Speaker 1)
-    ref_audio_path = "data/tts_ref_audio/1/11_0.wav"
+    # Actually, we should try to match the other experiment: 12 speakers.
+    # But CosyVoice requires 3s prompt. 
+    ref_audio_dir = Path("data/tts_ref_audio")
+    output_dir = Path("baseline_results/cosyvoice")
+    output_dir.mkdir(parents=True, exist_ok=True)
     
-    if not os.path.exists(ref_audio_path):
-        print(f"Ref audio not found: {ref_audio_path}")
-        # Create a dummy or skip
-        return
-
-    print(f"Synthesizing: {target_text}")
-    # zero_shot inference
-    prompt_speech_16k = load_wav(ref_audio_path, 16000)
+    # Target text (same as before)
+    target_text = "これは私の履歴書です、どうぞご覧ください。"
     
-    output = cosyvoice.inference_zero_shot(target_text, 'This is a prompt text placeholder', prompt_speech_16k)
+    # Limit to first 5 speakers for speed as requested "replacement"
+    speakers = sorted([d for d in ref_audio_dir.iterdir() if d.is_dir()])[:5]
     
-    # Save output
-    # output is usually a generator or list of dicts with 'tts_speech'
-    for i, item in enumerate(output):
-        torchaudio.save(f"{OUTPUT_DIR}/cosyvoice_output_{i}.wav", item['tts_speech'], 22050)
-        print(f"Saved {OUTPUT_DIR}/cosyvoice_output_{i}.wav")
+    for spk_dir in speakers:
+        print(f"Processing {spk_dir.name}...")
+        
+        # Find a wav file for prompt
+        ref_wavs = list(spk_dir.glob("*.wav"))
+        if not ref_wavs:
+            continue
+            
+        prompt_speech_16k = torchaudio.load(ref_wavs[0])[0]
+        
+        # Run inference
+        output = cosyvoice.inference_zero_shot(target_text, '日本語', prompt_speech_16k)
+        
+        # Save
+        out_name = output_dir / f"spk_{spk_dir.name}.wav"
+        torchaudio.save(out_name, output['tts_speech'], 22050)
+        
+    print("CosyVoice synthesis complete.")
 
 if __name__ == "__main__":
     main()

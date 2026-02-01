@@ -1,0 +1,9 @@
+
+# 2. ChatTTS
+# Ensure ChatTTS is installed?
+# source venv_tts/bin/activate
+# python tts/baseline_tts_chattts.py
+
+# 3. PaddleOCR
+# source venv/bin/activate (assuming paddle installed there)
+# python speech2text/baseline_ocr_paddle.py

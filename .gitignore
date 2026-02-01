@@ -55,3 +55,4 @@ F5-TTS/src/f5_tts/infer/examples/vocab.txt
 # Editor
 .vscode/
 .idea/
+venv_chattts/

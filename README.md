@@ -46,8 +46,10 @@ We evaluated the Optical Character Recognition (OCR) performance using **Qwen2-V
 | :--- | :---: | :---: | :---: | :---: |
 | **Qwen2-VL-2B-Instruct** | 2.82 | 0.35 | 0.50 | ✅ Completed |
 | **Qwen3-VL-4B-Instruct** | **1.74** | **0.37** | **0.59** | ✅ Completed |
+| **InternVL2-4B** | -- | -- | -- | ⏳ Script Ready |
+| **EasyOCR** | 81.73 | 0.54 | 0.71 | ✅ Completed |
 
-*   **Performance Upgrade**: Qwen3-VL-4B achieved a **38% reduction in Character Error Rate (CER)** compared to the Qwen2-VL-2B baseline, demonstrating significantly superior OCR capabilities for subtitle extraction.
+*   **Performance Upgrade**: Qwen3-VL-4B achieved a **1.74% CER**, vastly outperforming EasyOCR (81.73%), determining that traditional OCR struggles with scene text in drama videos.
 
 ### Experiment 2: Text-to-Speech (TTS)
 
@@ -67,6 +69,8 @@ We evaluated the ability of **Qwen3-VL** to translate processed Chinese subtitle
 | **Qwen2.5-3B-Instruct** | LoRA (Baseline) | -- | -- | *Reference* |
 | **Qwen3-VL-4B-Instruct** | Zero-shot | **19.53** | -- | ✅ Completed |
 | **Qwen3-VL-4B-Instruct** | LoRA (4-bit) | -- | 18.23 | ✅ Completed |
+| **NLLB-200** | MT Baseline | 9.73 | -- | ✅ Completed |
+| **Qwen2.5-7B-Instruct** | Text-only LLM | **10.30** | -- | ✅ Completed |
 
 *   **Observation**: The Fine-tuned model (18.23) slightly underperformed compared to Zero-shot (19.53). This suggests that the small-scale text-only fine-tuning (79 pairs) may have disrupted the model's pre-trained alignment or that 4-bit quantization effects were significant.
 
@@ -77,6 +81,7 @@ We compared the zero-shot voice cloning capabilities of **F5-TTS** (Flow Matchin
 | :--- | :--- | :---: | :---: |
 | **GPT-SoVITS v3** | Zero-shot | **1.17** | ✅ Completed |
 | **F5-TTS** | Zero-shot (Flow) | 2.29 | ✅ Completed |
+| **EdgeTTS** | API-based | -- | ✅ Completed |
 
 *   **Objective**: Benchmark benchmarking the new flow-matching architecture.
 *   **Result**: F5-TTS struggled with the cross-lingual zero-shot task using short (3-5s) reference audio, resulting in significant hallucinations and high WER compared to GPT-SoVITS.
@@ -147,20 +152,8 @@ We evaluated how the duration of the reference audio affects zero-shot speaker s
 | **Short (~3s)** | 0.64 | Lower similarity |
 | **Long (~10s)** | **0.71** | Longer prompts capture better speaker characteristics. |
 
-### B. Additional Baselines
 
-#### 1. Machine Translation (NLLB-200)
-We benchmarked our VLM-based translation against a traditional neural machine translation model.
-- **Model**: `facebook/nllb-200-distilled-600M`
-- **Result**: **9.73 BLEU**.
-- **Comparison**: significantly lower than Qwen3-VL (19.53 BLEU), highlighting the difficulty of the drama domain for general-purpose MT models without visual context.
-
-#### 2. OCR and TTS Baselines
-Scripts have been implemented to support further comparisons:
-- **OCR**: `OpenGVLab/InternVL2-4B`
-- **TTS**: `CosyVoice-300M`
-
-### C. End-to-End System Demonstration
+### B. End-to-End System Demonstration
 We implemented a proof-of-concept pipeline `run_end_to_end.py` that fully automates the workflow:
 1.  **Video Ingestion**: Reads `.mp4` file.
 2.  **Visual Extraction**: Qwen3-VL extracts subtitles (OCR).
