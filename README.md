@@ -56,6 +56,8 @@ We evaluated the Optical Character Recognition (OCR) performance using several V
 
 > [!NOTE]
 > **EasyOCR Metric Correction**: The initial high CER (81.7%) was caused by **temporal redundancy** (repeated detection of the same subtitle across consecutive 1fps frames). By implementing **Temporal Deduplication** (merging identical consecutive text blocks), the CER dropped to 0.39, while BLEU remained stable, confirming its reliability as a traditional baseline.
+>
+> **TrOCR Failure**: The TrOCR (Base) model outputted 0.00 metrics because it is pre-trained primarily on **English printed text** (e.g., receipts, documents). When applied to Chinese video subtitles, it failed to recognize any characters, outputting hallucinated English words (e.g., "TAX", "AMOUNT") or random numbers, resulting in zero overlap with the Chinese ground truth.
 
 ### 🔍 Ablation: FPS Sensitivity for Subtitle Recall
 To address potential "missing subtitles" at low frame rates (1fps), we conducted a comparison on `11.mp4`:
