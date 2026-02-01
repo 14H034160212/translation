@@ -82,25 +82,48 @@ def evaluate(model_path, data_dir, output_file, base_model_path="Qwen/Qwen3-VL-4
     refs = []
     preds = []
     
-    for item in tqdm(data_pairs):
-        pred = generate_translation(model, processor, item["chinese"])
-        results.append({
-            "id": item["id"],
-            "source": item["chinese"],
-            "reference": item["japanese"],
-            "prediction": pred
-        })
-        refs.append([item["japanese"]])
-        preds.append(pred)
+    # Simple cache check
+    cache_file = Path(output_file).with_suffix('.tmp.json')
+    if cache_file.exists():
+        print(f"Loading cached results from {cache_file}")
+        with open(cache_file, 'r', encoding='utf-8') as f:
+            results = json.load(f)
+        preds = [r["prediction"] for r in results]
+        refs = [[r["reference"]] for r in results]
+    else:
+        for item in tqdm(data_pairs):
+            pred = generate_translation(model, processor, item["chinese"])
+            results.append({
+                "id": item["id"],
+                "source": item["chinese"],
+                "reference": item["japanese"],
+                "prediction": pred
+            })
+            refs.append([item["japanese"]])
+            preds.append(pred)
+        
+        # Save cache
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(results, f, ensure_ascii=False, indent=4)
         
     # Calculate BLEU
-    bleu = sacrebleu.corpus_bleu(preds, refs, tokenize='ja-mecab')
-    print(f"BLEU: {bleu.score}")
-    
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False, indent=4)
+    try:
+        bleu = sacrebleu.corpus_bleu(preds, refs, tokenize='ja-mecab')
+        print(f"BLEU: {bleu.score}")
         
-    return bleu.score
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                "bleu": bleu.score,
+                "results": results
+            }, f, ensure_ascii=False, indent=4)
+            
+        return bleu.score
+    except Exception as e:
+        print(f"Error calculating BLEU: {e}")
+        # Still save the results even if BLEU fails
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump({"error": str(e), "results": results}, f, ensure_ascii=False, indent=4)
+        return 0
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

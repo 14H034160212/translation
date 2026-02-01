@@ -30,26 +30,30 @@ def evaluate_tts(results_dir, test_sentences):
         result = model.transcribe(str(audio_path), language=lang_code)
         transcribed_text = result['text'].strip()
         
-        # Calculate WER (Note: for ZH/JA character-level CER might be better, but jiwer.wer works on tokens)
-        # For simplicity in this baseline, we use standard WER
-        error_rate = wer(target_text, transcribed_text)
+        # Calculate WER and CER
+        from jiwer import wer, cer
+        error_wer = wer(target_text, transcribed_text)
+        error_cer = cer(target_text, transcribed_text)
         
         results.append({
             "name": audio_path.name,
             "target": target_text,
             "transcribed": transcribed_text,
-            "wer": error_rate
+            "wer": error_wer,
+            "cer": error_cer
         })
         
         print(f"Target: {target_text}")
         print(f"Got   : {transcribed_text}")
-        print(f"WER   : {error_rate:.4f}\n")
+        print(f"WER   : {error_wer:.4f}, CER: {error_cer:.4f}\n")
     
-    # Calculate average WER
+    # Calculate average metrics
     if results:
         avg_wer = sum(r['wer'] for r in results) / len(results)
+        avg_cer = sum(r['cer'] for r in results) / len(results)
         print(f"--- Final Evaluation ---")
         print(f"Average WER: {avg_wer:.4f}")
+        print(f"Average CER: {avg_cer:.4f}")
 
 if __name__ == "__main__":
     TEST_SENTENCES = {

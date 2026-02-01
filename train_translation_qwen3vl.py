@@ -81,8 +81,11 @@ class Qwen3VLTranslationTrainer:
             self.model_name,
             trust_remote_code=True
         )
-        # Expose tokenizer for DataCollator
-        self.tokenizer = self.processor.tokenizer
+        if hasattr(self.processor, "tokenizer"):
+            self.tokenizer = self.processor.tokenizer
+        else:
+            self.tokenizer = self.processor
+            
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
             

@@ -41,6 +41,7 @@ def evaluate_edgetts(results_dir):
     print(f"Evaluating EdgeTTS results in {results_dir}...")
     
     total_wer = 0
+    total_cer = 0
     count = 0
     
     # Check what files exist
@@ -67,20 +68,26 @@ def evaluate_edgetts(results_dir):
         result = model.transcribe(str(file_path), language=lang)
         predicted_text = result['text'].strip()
         
-        error = wer(target_text, predicted_text)
+        from jiwer import wer, cer
+        error_wer = wer(target_text, predicted_text)
+        error_cer = cer(target_text, predicted_text)
         
         results.append({
             "file": file_path.name,
             "target": target_text,
             "predicted": predicted_text,
-            "wer": error
+            "wer": error_wer,
+            "cer": error_cer
         })
         
-        total_wer += error
+        total_wer += error_wer
+        total_cer += error_cer if 'total_cer' in locals() else error_cer # init below
         count += 1
         
     avg_wer = total_wer / count if count > 0 else 0
+    avg_cer = total_cer / count if count > 0 else 0
     print(f"Average WER: {avg_wer:.4f}")
+    print(f"Average CER: {avg_cer:.4f}")
     
     # Save results
     df = pd.DataFrame(results)
