@@ -7,8 +7,10 @@ This repository contains the implementation and experimental results for a multi
 ### A. Subtitle Recognition (Subtitle Extraction)
 *   **Model 1 (Baseline)**: [Qwen/Qwen2-VL-2B-Instruct](https://huggingface.co/Qwen/Qwen2-VL-2B-Instruct)
 *   **Model 2 (Enhanced)**: [Qwen/Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct)
-    *   *Note*: Qwen3-VL-4B was run in a dedicated Python 3.11 environment with development versions of `transformers` to support the new architecture.
-*   **Method**: Zero-shot Video-Language Understanding.
+    *   *Note*: Qwen3-VL-4B was run in a dedicated Python 3.11 environment.
+*   **Model 3 (Alternative)**: [OpenGVLab/InternVL2-4B](https://huggingface.co/OpenGVLab/InternVL2-4B)
+*   **Model 4 (Traditional)**: [EasyOCR](https://github.com/JaidedAI/EasyOCR)
+*   **Method**: Zero-shot Video-Language Understanding / OCR.
 *   **Input**: Video frames extracted at 1 frame/second.
 *   **Output**: Chinese subtitle text.
 
@@ -17,17 +19,18 @@ This repository contains the implementation and experimental results for a multi
     *   *Method*: Zero-shot Voice Cloning (Reference-based Synthesis).
 *   **Model 2 (Comparison)**: [F5-TTS](https://github.com/SWivid/F5-TTS)
     *   *Method*: Flow Matching (Zero-shot).
+*   **Model 3 (Fallback)**: [EdgeTTS](https://github.com/rany2/edge-tts)
+    *   *Method*: API-based text-to-speech.
 *   **Input**: Source Chinese audio (for timbre reference) + Target Japanese text.
 *   **Output**: Japanese speech audio.
 
 ### C. Subtitle Translation (LoRA Fine-tuning)
-*   **Model**: Qwen2.5-3B-Instruct
-*   **Method**: Low-Rank Adaptation (LoRA)
-*   **Parameters**:
-    *   Rank: 16
-    *   Alpha: 32
-    *   Learning Rate: 2e-4
-    *   Quantization: 4-bit (NF4)
+*   **Model 1**: Qwen2.5-3B-Instruct (LoRA Fine-tuning)
+    *   *Rank*: 16, *Alpha*: 32, *Quantization*: 4-bit (NF4).
+*   **Model 2**: [NLLB-200](https://huggingface.co/facebook/nllb-200-distilled-600M)
+    *   *Method*: Machine Translation Baseline.
+*   **Model 3**: [Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)
+    *   *Method*: Text-only LLM Zero-shot.
 
 ## 2. Datasets
 
@@ -46,7 +49,7 @@ We evaluated the Optical Character Recognition (OCR) performance using **Qwen2-V
 | :--- | :---: | :---: | :---: | :---: |
 | **Qwen2-VL-2B-Instruct** | 2.82 | 0.35 | 0.50 | ✅ Completed |
 | **Qwen3-VL-4B-Instruct** | **1.74** | **0.37** | **0.59** | ✅ Completed |
-| **InternVL2-4B** | -- | -- | -- | ⏳ Script Ready |
+| **InternVL2-4B** | 3.64 | 0.18 | 0.34 | ✅ Completed |
 | **EasyOCR** | 81.73 | 0.54 | 0.71 | ✅ Completed |
 
 *   **Performance Upgrade**: Qwen3-VL-4B achieved a **1.74% CER**, vastly outperforming EasyOCR (81.73%), determining that traditional OCR struggles with scene text in drama videos.
@@ -64,15 +67,16 @@ We generated 38 Japanese audio samples across 12 different speakers, cloning the
 ### Experiment 3: Subtitle Translation
 We evaluated the ability of **Qwen3-VL** to translate processed Chinese subtitles into Japanese, comparing its Zero-shot performance against a Fine-tuned version.
 
-| Model | Method | BLEU (Zero-shot) | BLEU (Fine-tuned) | Status |
-| :--- | :--- | :---: | :---: | :---: |
-| **Qwen2.5-3B-Instruct** | LoRA (Baseline) | -- | -- | *Reference* |
-| **Qwen3-VL-4B-Instruct** | Zero-shot | **19.53** | -- | ✅ Completed |
-| **Qwen3-VL-4B-Instruct** | LoRA (4-bit) | -- | 18.23 | ✅ Completed |
-| **NLLB-200** | MT Baseline | 9.73 | -- | ✅ Completed |
-| **Qwen2.5-7B-Instruct** | Text-only LLM | **10.30** | -- | ✅ Completed |
+| Model | Size | Zero-shot BLEU | Fine-tuned BLEU | Status |
+| :--- | :---: | :---: | :---: | :---: |
+| **Qwen3-VL-4B-Instruct** | 4B | **19.53** | 18.23* | ✅ Completed |
+| **Qwen2.5-3B-Instruct** | 3B | 11.69 | 12.00 | ✅ Completed |
+| **Qwen2.5-7B-Instruct** | 7B | 10.30 | -- | ✅ Baseline |
+| **NLLB-Distilled** | 600M | 9.73 | -- | ✅ Baseline |
 
-*   **Observation**: The Fine-tuned model (18.23) slightly underperformed compared to Zero-shot (19.53). This suggests that the small-scale text-only fine-tuning (79 pairs) may have disrupted the model's pre-trained alignment or that 4-bit quantization effects were significant.
+*   **Experimental Design**: The **Qwen2.5-7B** and **NLLB** models serve as "Static Baselines" to provide a performance reference from larger general-purpose models or specialized MT systems without task-specific LoRA tuning. 
+*   **Observation**: Qwen2.5-3B improved slightly with fine-tuning (11.69 -> 12.00). The 4B model (19.53) remains the overall champion, demonstrating that newer VLM architectures outperform larger text-only LLMs for this task.
+*   **Legend**: `--` denotes that the model was used exclusively in its pre-trained state for baseline comparison.
 
 ### Experiment 4: TTS Comparison (F5-TTS)
 We compared the zero-shot voice cloning capabilities of **F5-TTS** (Flow Matching) against the baseline **GPT-SoVITS** (VITS-based).
@@ -81,7 +85,7 @@ We compared the zero-shot voice cloning capabilities of **F5-TTS** (Flow Matchin
 | :--- | :--- | :---: | :---: |
 | **GPT-SoVITS v3** | Zero-shot | **1.17** | ✅ Completed |
 | **F5-TTS** | Zero-shot (Flow) | 2.29 | ✅ Completed |
-| **EdgeTTS** | API-based | -- | ✅ Completed |
+| **EdgeTTS** | API-based | 1.39 | ✅ Completed |
 
 *   **Objective**: Benchmark benchmarking the new flow-matching architecture.
 *   **Result**: F5-TTS struggled with the cross-lingual zero-shot task using short (3-5s) reference audio, resulting in significant hallucinations and high WER compared to GPT-SoVITS.
