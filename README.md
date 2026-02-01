@@ -49,10 +49,14 @@ We evaluated the Optical Character Recognition (OCR) performance using several V
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Qwen3-VL-4B-Instruct** | **0.081** | **0.999** | **0.916** | **0.941** | ✅ Best |
 | **Qwen2-VL-2B-Instruct** | 0.124 | 0.994 | 0.882 | 0.912 | ✅ Parent |
+| **RapidOCR (PaddleOCR)** | 0.154 | 0.958 | 0.863 | 0.854 | ✅ Trad+ |
 | **InternVL2-4B** | 0.174 | 0.985 | 0.835 | 0.881 | ✅ VLM Base |
 | **GOT-OCR2.0** | 0.365 | 0.959 | 0.782 | 0.731 | ✅ Trad+ |
 | **EasyOCR (Deduplicated)** | **0.390** | 0.942 | 0.741 | 0.762 | ✅ Optimized |
 | **TrOCR (Base)** | 0.874 | 0.126 | 0.000 | 0.000 | ✅ Encoder |
+
+> [!NOTE]
+> **RapidOCR (PaddleOCR)**: We used **RapidOCR** (an ONNX implementation of PaddleOCR) because the native `paddlepaddle` Linux binaries encountered compatibility issues (Illegal Instruction/SIGILL) on this specific hardware environment. RapidOCR successfully ran and demonstrated **excellent performance (CER 0.154)**, significantly outperforming other traditional methods (EasyOCR) and even some VLMs (InternVL2).
 
 > [!NOTE]
 > **EasyOCR Metric Correction**: The initial high CER (81.7%) was caused by **temporal redundancy** (repeated detection of the same subtitle across consecutive 1fps frames). By implementing **Temporal Deduplication** (merging identical consecutive text blocks), the CER dropped to 0.39, while BLEU remained stable, confirming its reliability as a traditional baseline.
