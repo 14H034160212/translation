@@ -1,0 +1,3 @@
+video_file,model_name,full_transcription,ground_truth,cer,character_accuracy,bleu_score,chrf_score,confidence,processing_time,status
+1.mp4,whisper_medium,,,,,,,,,SKIPPED: 无标准字幕
+10.mp4,whisper_medium,,,,,,,,,SKIPPED: 无标准字幕

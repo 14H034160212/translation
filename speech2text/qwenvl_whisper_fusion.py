@@ -14,6 +14,7 @@ import requests
 import pandas as pd
 import sacrebleu
 import jiwer
+import numpy as np
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
@@ -467,6 +468,75 @@ class QwenVLWhisperFusion:
         self.logger.info("Whisper ASR complete")
         return result
 
+    def align_and_fuse_adaptive(self, 
+                               qwenvl_subtitles: List[Tuple[float, str]], 
+                               whisper_segments: List[Dict[str, Any]]) -> Tuple[str, List[Dict[str, Any]]]:
+        """
+        Adaptive fusion logic: dynamic threshold based on Whisper confidence.
+        Logic: Lower Whisper confidence -> Lower OCR replacement threshold (more likely to trust OCR).
+        """
+        self.logger.info(f"Starting adaptive fusion: {len(qwenvl_subtitles)} subtitles")
+        
+        qwenvl_timed = []
+        for ts, text in qwenvl_subtitles:
+            qwenvl_timed.append({'start': ts, 'end': ts + self.frame_interval, 'text': text})
+        
+        final_segments = []
+        alignment_details = []
+        
+        for ws in whisper_segments:
+            # Calculate ASR confidence from logprob
+            # avg_logprob is typically between -1.5 (low confidence) and -0.01 (high)
+            logprob = ws.get('avg_logprob', -1.0)
+            confidence = np.exp(logprob)
+            
+            # Adaptive threshold: 
+            # Mapping confidence [0.0, 1.0] to threshold [45, 85]
+            # More conservative: If high confidence (1.0), threshold is 85% (trust ASR)
+            # If low confidence (0.0), threshold is 45% (allow more OCR substitution)
+            # Static 60% corresponds to confidence 0.375
+            adaptive_threshold = 45 + (confidence * 40)
+            
+            start_time = ws['start'] - self.time_tolerance
+            end_time = ws['end'] + self.time_tolerance
+            
+            overlapping_qwenvl = [
+                qs for qs in qwenvl_timed 
+                if max(start_time, qs['start']) < min(end_time, qs['end'])
+            ]
+            
+            detail = {
+                "whisper_segment": ws,
+                "confidence": float(confidence),
+                "adaptive_threshold": float(adaptive_threshold),
+                "decision": "whisper",
+                "similarity": 0.0,
+                "replaced_text": None
+            }
+            
+            if overlapping_qwenvl:
+                similarities = []
+                for qs in overlapping_qwenvl:
+                    similarity = fuzz.ratio(ws['text'], qs['text'])
+                    similarities.append({'text': qs['text'], 'sim': similarity})
+                
+                best_match = max(similarities, key=lambda x: x['sim'])
+                detail["similarity"] = best_match['sim']
+                
+                if best_match['sim'] >= adaptive_threshold:
+                    detail["decision"] = "qwenvl"
+                    detail["replaced_text"] = best_match['text']
+                    final_segments.append({**ws, 'text': best_match['text']})
+                else:
+                    final_segments.append(ws)
+            else:
+                final_segments.append(ws)
+            
+            alignment_details.append(detail)
+            
+        final_text = " ".join([s['text'].strip() for s in final_segments])
+        return final_text, alignment_details
+
     def align_and_fuse(self, 
                        qwenvl_subtitles: List[Tuple[float, str]], 
                        whisper_segments: List[Dict[str, Any]]) -> Tuple[str, List[Dict[str, Any]]]:
@@ -566,6 +636,7 @@ class QwenVLWhisperFusion:
         """
         # 尝试多个可能的字幕目录路径
         possible_subtitle_dirs = [
+            Path("extracted_data/闪婚幸运草的命中注定/带角色标注的字幕"),
             Path("data/闪婚幸运草的命中注定/带角色标注的字幕"),
             Path("../data/闪婚幸运草的命中注定/带角色标注的字幕"),
             Path("speech2text/../data/闪婚幸运草的命中注定/带角色标注的字幕")
@@ -725,7 +796,8 @@ class QwenVLWhisperFusion:
             whisper_segments = whisper_result["segments"]
             
             # 6. 核心融合逻辑
-            final_result, alignment_details = self.align_and_fuse(
+            # 使用自适应阈值逻辑完成 ASR/OCR 融合
+            final_result, alignment_details = self.align_and_fuse_adaptive(
                 subtitle_segments, whisper_segments
             )
             
