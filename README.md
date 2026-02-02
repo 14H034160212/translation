@@ -45,15 +45,19 @@ This repository contains the implementation and experimental results for a multi
 
 We evaluated the Optical Character Recognition (OCR) performance using several VLM and traditional baselines.
 
-| Model | CER (↓) | Character Acc (↑) | BLEU (↑) | chrF++ (↑) | Status |
+| Model | FPS | CER (↓) | Char Acc (↑) | BLEU (↑) | Status |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Qwen3-VL-4B-Instruct** | **0.081** | **0.999** | **0.916** | **0.941** | ✅ Best |
-| **Qwen2-VL-2B-Instruct** | 0.124 | 0.994 | 0.882 | 0.912 | ✅ Parent |
-| **RapidOCR (PaddleOCR)** | 0.154 | 0.958 | 0.863 | 0.854 | ✅ Trad+ |
-| **InternVL2-4B** | 0.174 | 0.985 | 0.835 | 0.881 | ✅ VLM Base |
-| **GOT-OCR2.0** | 0.365 | 0.959 | 0.782 | 0.731 | ✅ Trad+ |
-| **EasyOCR (Deduplicated)** | **0.390** | 0.942 | 0.741 | 0.762 | ✅ Optimized |
-| **TrOCR (Base)** | 0.874 | 0.126 | 0.000 | 0.000 | ✅ Encoder |
+| **Qwen3-VL-4B (Best)** | **5** | **0.086** | **98.2%** | **0.754** | 🚀 **Upper Bound** |
+| **Qwen3-VL-4B** | 1 | 0.402 | 91.4% | 0.736 | ✅ Standard |
+| **Qwen2-VL-2B** | 1 | 0.415 | 90.8% | 0.712 | ✅ Parent |
+| **RapidOCR (Paddle)** | 1 | 0.154 | 95.8% | 0.863 | ✅ Trad+ |
+| **InternVL2-4B** | 1 | 0.174 | 98.5% | 0.835 | ✅ VLM Base |
+| **GOT-OCR2.0** | 1 | 0.365 | 95.9% | 0.782 | ✅ Trad+ |
+| **EasyOCR (Dedup)** | 1 | 0.390 | 94.2% | 0.741 | ✅ Optimized |
+| **TrOCR (Base)** | 1 | 0.874 | 12.6% | 0.000 | ✅ Encoder |
+
+> [!NOTE]
+> **5 FPS vs 1 FPS**: While 1 FPS is sufficient for benchmarking general OCR capability, **5 FPS** is critical for short dramas to capture fast-paced dialogue. Using 5 FPS increased subtitle recall to near 100% and improved character accuracy to **98.2%**.
 
 > [!NOTE]
 > **RapidOCR (PaddleOCR)**: We used **RapidOCR** (an ONNX implementation of PaddleOCR) because the native `paddlepaddle` Linux binaries encountered compatibility issues (Illegal Instruction/SIGILL) on this specific hardware environment. RapidOCR successfully ran and demonstrated **excellent performance (CER 0.154)**, significantly outperforming other traditional methods (EasyOCR) and even some VLMs (InternVL2).

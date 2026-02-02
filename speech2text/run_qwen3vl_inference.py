@@ -8,21 +8,23 @@ import cv2
 from transformers import AutoModelForCausalLM, AutoProcessor
 from accelerate import Accelerator
 
-def extract_frames(video_path, interval=1.0):
-    """Extract frames from video at fixed intervals."""
+def extract_frames(video_path, fps_target=1.0):
+    """Extract frames from video at fixed FPS."""
     frames = []
     cap = cv2.VideoCapture(str(video_path))
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    if fps == 0: return []
+    video_fps = cap.get(cv2.CAP_PROP_FPS)
+    if video_fps == 0: return []
     
-    interval_frames = int(fps * interval)
+    # Calculate interval in frames
+    frame_interval = max(1, int(video_fps / fps_target))
+    
     count = 0
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
-        if count % interval_frames == 0:
-            timestamp = count / fps
+        if count % frame_interval == 0:
+            timestamp = count / video_fps
             # Convert BGR to RGB
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frames.append((Image.fromarray(frame_rgb), timestamp))
@@ -30,7 +32,11 @@ def extract_frames(video_path, interval=1.0):
     cap.release()
     return frames
 
-def run_inference(model_id, video_dir, output_dir, batch_size=8):
+def run_inference(model_id, video_dir, output_dir, batch_size=8, fps=1.0):
+    # ... (imports) ...
+
+    # Skip to processing loop
+    # ...
     try:
         from qwen_vl_utils import process_vision_info
     except ImportError:
@@ -93,7 +99,10 @@ def run_inference(model_id, video_dir, output_dir, batch_size=8):
             continue
             
         print(f"Processing {video_file.name}...")
-        frames = extract_frames(video_file)
+        # ...
+
+        # Extract frames
+        frames = extract_frames(video_file, fps_target=fps)
         
         video_results = []
         
@@ -172,9 +181,20 @@ def run_inference(model_id, video_dir, output_dir, batch_size=8):
     print(f"All results saved to {result_path}")
     return result_path
 
+    return result_path
+
 if __name__ == "__main__":
-    MODEL_ID = "Qwen/Qwen3-VL-4B-Instruct" 
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fps", type=float, default=1.0)
+    parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--model_id", type=str, default="Qwen/Qwen3-VL-4B-Instruct")
+    parser.add_argument("--output_dir", type=str, default="baseline_results/qwen3vl_4b_fps5")
+    args = parser.parse_args()
+
     VIDEO_DIR = "extracted_data/闪婚幸运草的命中注定"
-    OUTPUT_DIR = "baseline_results"
     
-    run_inference(MODEL_ID, VIDEO_DIR, OUTPUT_DIR, batch_size=8)
+    # Update extract_frames to use args.fps (need to pass it)
+    # Actually, run_inference needs to accept fps
+    # Let's modify run_inference signature first
+    run_inference(args.model_id, VIDEO_DIR, args.output_dir, batch_size=args.batch_size, fps=args.fps)
