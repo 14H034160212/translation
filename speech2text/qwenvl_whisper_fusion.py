@@ -511,6 +511,9 @@ class QwenVLWhisperFusion:
                 "adaptive_threshold": float(adaptive_threshold),
                 "decision": "whisper",
                 "similarity": 0.0,
+                "best_match_qwenvl": None,
+                "overlapping_qwenvl": overlapping_qwenvl,
+                "all_similarities": [],
                 "replaced_text": None
             }
             

@@ -97,7 +97,18 @@ We evaluated the ability of **Qwen3-VL** to translate processed Chinese subtitle
 *   **Significant Breakthrough**: After fixing a training bug (epoch mismatch) and optimizing hyperparameters (Rank 32, Alpha 64, Epochs 20), the **Fine-tuned Qwen3-VL-4B (v2)** achieved a massive leap in performance (**31.73 BLEU**), vastly outperforming the Zero-shot baseline.
 *   **Conclusion**: Even with a small high-quality dataset (79 pairs), proper LoRA fine-tuning can successfully adapt the VLM to the specific stylistic requirements of dramatic subtitles.
 
-### Experiment 4: TTS Comparison (F5-TTS)
+### Experiment 5: Multimodal Fusion (ASR + OCR)
+
+We implemented an **Adaptive Fusion** strategy that combines the strengths of **Whisper (ASR)** and **Qwen3-VL (OCR)**. The system dynamically adjusts its trust in OCR based on ASR confidence (avg_logprob).
+
+| Mode | BLEU (↑) | chrF++ (↑) | CER (↓) | Char Acc (↑) | Composite (↑) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **QwenVL Only** | 4.44 | 9.29 | 0.900 | 0.100 | 0.084 |
+| **Whisper Only** | 81.32 | 57.64 | 0.249 | 0.783 | 0.731 |
+| **Adaptive Fusion** | **81.68** | **67.91** | **0.156** | **0.899** | **0.810** |
+
+> [!TIP]
+> **Performance Gain**: The unified fusion strategy achieved a **+0.079 (+10.8%)** improvement in composite score over the pure ASR baseline. Notably, the **chrF++** score (sensitive to character-level matches) increased from 57.6 to **67.9**, proving that OCR successfully corrected Whisper's phonetic hallucinations using visual context.
 We compared the zero-shot voice cloning capabilities of **F5-TTS** (Flow Matching) against the baseline **GPT-SoVITS** (VITS-based).
 
 | Model | Method | Avg. WER ↓ | Status |
