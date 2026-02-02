@@ -59,4 +59,3 @@ venv_chattts/
 speech2text/frames_cache_hybrid/
 speech2text/qwenvl_cache_hybrid_no_post_3090/
 baseline_results/adaptive_fusion_final/
-speech2text/migrate_cache.py
