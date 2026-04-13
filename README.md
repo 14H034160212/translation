@@ -78,24 +78,29 @@ To address potential "missing subtitles" at low frame rates (1fps), we conducted
 
 We generated Japanese audio samples across 12 different speakers using zero-shot voice cloning.
 
-| Metrics | Value | Description |
-| :--- | :---: | :--- |
-| **Avg. WER** | **1.14** | Word Error Rate (evaluated via Whisper) |
-| **Avg. CER** | **0.50** | Character Error Rate |
-| **Intelligibility**| High | Audio is clear and consistent with source. |
+| Model | Method | Avg. WER ↓ | Avg. CER ↓ |
+| :--- | :--- | :---: | :---: |
+| **GPT-SoVITS v3** | Zero-shot cloning | **1.17** | **0.50** |
+| **EdgeTTS** | API (fixed voice) | 1.39 | — |
+| **F5-TTS** | Flow matching (ZS) | 1.99 | 0.95 |
+
+> EdgeTTS uses a single fixed neural voice (`ja-JP-NanamiNeural`) without speaker cloning; per-speaker CER is not applicable.
 
 ### Experiment 3: Subtitle Translation
-We evaluated the ability of **Qwen3-VL** to translate processed Chinese subtitles into Japanese, comparing its Zero-shot performance against a Fine-tuned version.
+We evaluated the ability of **Qwen3-VL** to translate processed Chinese subtitles into Japanese, comparing zero-shot and fine-tuned performance against several baselines.
 
-| Model | Size | Zero-shot BLEU | Fine-tuned BLEU | Status |
+| Model | Setting | BLEU ↑ | chrF++ ↑ | COMET ↑ |
 | :--- | :---: | :---: | :---: | :---: |
-| **Qwen3-VL-4B-Instruct** | 4B | 19.53 | **31.73** (v2) | ✅ Best |
-| **Qwen2.5-3B-Instruct** | 3B | 11.69 | 12.00 | ✅ Parent |
-| **Qwen2.5-7B-Instruct** | 7B | 10.30 | -- | ✅ Baseline |
-| **NLLB-Distilled** | 600M | 9.73 | -- | ✅ Baseline |
+| **Qwen3-VL-4B** | FT (v2) | **29.99** | **39.34** | **0.8699** |
+| **Qwen2.5-7B** | ZS | 19.75 | 32.83 | 0.8287 |
+| **Qwen3-VL-4B** | ZS | 18.54 | 32.18 | 0.8097 |
+| **Qwen2.5-3B** | FT | 12.00 | 29.99 | 0.6437 |
+| **Qwen2.5-3B** | ZS | 11.69 | 27.89 | 0.6160 |
+| **NLLB-200 (600M)** | ZS | 2.91 | 10.66 | 0.3781 |
 
-*   **Significant Breakthrough**: After fixing a training bug (epoch mismatch) and optimizing hyperparameters (Rank 32, Alpha 64, Epochs 20), the **Fine-tuned Qwen3-VL-4B (v2)** achieved a massive leap in performance (**31.73 BLEU**), vastly outperforming the Zero-shot baseline.
-*   **Conclusion**: Even with a small high-quality dataset (79 pairs), proper LoRA fine-tuning can successfully adapt the VLM to the specific stylistic requirements of dramatic subtitles.
+*   **Fine-tuning** (Rank 32, Alpha 64, up to 20 epochs with early stopping): LoRA fine-tuned Qwen3-VL-4B achieves BLEU 29.99 — a **+61.8% relative gain** over its zero-shot baseline.
+*   **NLLB-200** scores only 2.91 BLEU, indicating that general-purpose MT models are poorly suited for the colloquial, speaker-tagged subtitle format used in this dataset.
+*   **Note**: Qwen2.5-7B and NLLB-200 were re-evaluated with corrected inference scripts (increased generation length, corrected sacrebleu API); earlier reported values were derived from truncated outputs.
 
 ### Experiment 5: Multimodal Fusion (ASR + OCR)
 
@@ -111,14 +116,13 @@ We implemented an **Adaptive Fusion** strategy that combines the strengths of **
 > **Performance Gain**: The unified fusion strategy achieved a **+0.079 (+10.8%)** improvement in composite score over the pure ASR baseline. Notably, the **chrF++** score (sensitive to character-level matches) increased from 57.6 to **67.9**, proving that OCR successfully corrected Whisper's phonetic hallucinations using visual context.
 We compared the zero-shot voice cloning capabilities of **F5-TTS** (Flow Matching) against the baseline **GPT-SoVITS** (VITS-based).
 
-| Model | Method | Avg. WER ↓ | Status |
-| :--- | :--- | :---: | :---: |
-| **GPT-SoVITS v3** | Zero-shot | **1.17** | ✅ Completed |
-| **F5-TTS** | Zero-shot (Flow) | 2.29 | ✅ Completed |
-| **EdgeTTS** | API-based | 1.39 | ✅ Completed |
+| Model | Method | Avg. WER ↓ |
+| :--- | :--- | :---: |
+| **GPT-SoVITS v3** | Zero-shot cloning | **1.17** |
+| **EdgeTTS** | API (fixed voice) | 1.39 |
+| **F5-TTS** | Flow matching (ZS) | 1.99 |
 
-*   **Objective**: Benchmark benchmarking the new flow-matching architecture.
-*   **Result**: F5-TTS struggled with the cross-lingual zero-shot task using short (3-5s) reference audio, resulting in significant hallucinations and high WER compared to GPT-SoVITS.
+*   **Result**: F5-TTS struggled with the cross-lingual zero-shot task using short (3-5s) reference audio, resulting in higher WER compared to GPT-SoVITS.
 
 ## 4. Reproduction Steps
 
@@ -172,10 +176,12 @@ In response to reviewer feedback, we conducted additional ablation studies, base
 We assessed the impact of visual context on translation quality using Qwen3-VL.
 - **Method**: Comparing translation BLEU scores with and without video frame input.
 
-| Context | BLEU ↑ | Conclusion |
-| :--- | :---: | :--- |
-| **Text-Only (OCR)** | 14.18 | Baseline |
-| **Multimodal (Video + Text)** | **18.06** | **+3.88 BLEU** improvement with visual context. |
+| Context | BLEU ↑ | chrF++ ↑ |
+| :--- | :---: | :---: |
+| **Text-Only (OCR subtitles)** | 10.09 | 28.26 |
+| **Multimodal (Video frames + Text)** | **13.44** | **29.70** |
+
+**+3.35 BLEU** improvement with visual context (20-episode subset, Qwen3-VL zero-shot).
 
 #### 2. TTS Reference Length (F5-TTS)
 We evaluated how the duration of the reference audio affects zero-shot speaker similarity.
