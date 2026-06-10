@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本語音声合成の評価 / TTS Evaluation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", sans-serif;
+    background: #f5f7fa;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+  .shell {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+  /* ── progress ── */
+  .progress-wrap {
+    background: #e2e8f0;
+    border-radius: 99px;
+    height: 6px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    height: 100%;
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+  .progress-label {
+    font-size: 13px;
+    color: #64748b;
+    text-align: right;
+    margin-top: 6px;
+  }
+  /* ── card ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    padding: 32px;
+    margin-bottom: 20px;
+  }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #1e293b; }
+  p  { font-size: 15px; line-height: 1.7; color: #475569; margin-bottom: 10px; }
+  /* ── intro ── */
+  .badge {
+    display: inline-block;
+    background: #ede9fe;
+    color: #6d28d9;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-bottom: 12px;
+    letter-spacing: .04em;
+  }
+  .rule-list { list-style: none; padding: 0; }
+  .rule-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 14px; color: #334155; padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .rule-list li:last-child { border-bottom: none; }
+  .rule-num {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    background: #4f46e5; color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  /* ── form fields ── */
+  label.field-label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: #374151; margin-bottom: 6px; margin-top: 18px;
+  }
+  select, input[type=text] {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid #d1d5db; border-radius: 8px;
+    font-size: 14px; color: #1a1a2e;
+    background: #fafafa;
+    outline: none;
+    transition: border-color .2s;
+  }
+  select:focus, input[type=text]:focus { border-color: #4f46e5; background: #fff; }
+  /* ── audio block ── */
+  .audio-block {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #fafbff;
+  }
+  .audio-label {
+    font-size: 13px; font-weight: 700;
+    color: #4f46e5; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .audio-label .tag {
+    background: #4f46e5; color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 2px 9px; border-radius: 99px;
+  }
+  .audio-label .tag.ref {
+    background: #0f766e;
+  }
+  iframe.player {
+    width: 100%; height: 54px;
+    border: none; border-radius: 8px;
+    background: #f1f5f9;
+    display: block;
+  }
+  /* ── rating ── */
+  .rating-row {
+    display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .rating-row label {
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px;
+  }
+  .rating-row input[type=radio] { display: none; }
+  .rating-btn {
+    width: 44px; height: 44px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #64748b;
+    background: #fff;
+    transition: all .15s;
+  }
+  .rating-row input[type=radio]:checked + .rating-btn {
+    background: #4f46e5; border-color: #4f46e5; color: #fff;
+  }
+  .rating-row label:hover .rating-btn {
+    border-color: #818cf8; color: #4f46e5;
+  }
+  .scale-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: #94a3b8; margin-top: 4px;
+    padding: 0 4px;
+  }
+  /* ── similarity ── */
+  .sim-question { margin-top: 20px; }
+  .sim-question p { font-weight: 600; font-size: 14px; color: #1e293b; margin-bottom: 10px; }
+  .sim-options {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .sim-options label { cursor: pointer; }
+  .sim-options input[type=radio] { display: none; }
+  .sim-btn {
+    padding: 8px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: #64748b;
+    background: #fff;
+    transition: all .15s;
+  }
+  .sim-options input[type=radio]:checked + .sim-btn {
+    background: #0f766e; border-color: #0f766e; color: #fff;
+  }
+  .sim-options label:hover .sim-btn {
+    border-color: #14b8a6; color: #0f766e;
+  }
+  /* ── sentence display ── */
+  .sentence-box {
+    background: #f8fafc; border-left: 4px solid #4f46e5;
+    padding: 12px 16px; border-radius: 0 8px 8px 0;
+    font-size: 15px; color: #1e293b;
+    margin-bottom: 20px;
+  }
+  /* ── buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px;
+    border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,70,229,.4); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary {
+    background: #f1f5f9; color: #475569;
+  }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+  /* ── validation ── */
+  .warn { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
+  /* ── complete ── */
+  .check-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #059669);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; margin: 0 auto 20px;
+  }
+  /* ── pages ── */
+  .page { display: none; }
+  .page.active { display: block; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ══════════ PAGE: INTRO ══════════ -->
+<div id="pg-intro" class="page active">
+  <div class="card">
+    <div class="badge">研究アンケート / Research Survey</div>
+    <h1>日本語音声合成の評価<br><span style="font-size:16px;font-weight:400;color:#64748b">Japanese Speech Synthesis Evaluation</span></h1>
+    <p style="margin-top:12px">日本語合成音声の自然さと話者類似度を評価していただきます。<br>
+    <span style="color:#94a3b8">You will rate the naturalness and speaker similarity of synthesised Japanese speech.</span></p>
+  </div>
+
+  <div class="card">
+    <h2>参加条件 / Eligibility</h2>
+    <ul class="rule-list">
+      <li><div class="rule-num">✓</div><span>日本語母語者、またはJLPT N1/N2レベル<br><span style="color:#94a3b8">Native Japanese or JLPT N1/N2 level</span></span></li>
+      <li><div class="rule-num">✓</div><span>ヘッドフォン・イヤホン使用推奨<br><span style="color:#94a3b8">Headphones or earphones recommended</span></span></li>
+    </ul>
+
+    <h2 style="margin-top:24px">手順 / Instructions</h2>
+    <ul class="rule-list">
+      <li><div class="rule-num">1</div><span>各問で<b>参照音声（REF）</b>を先に聴いてください。これは人間の話者の元の声です。<br><span style="color:#94a3b8">Listen to the <b>Reference Audio (REF)</b> first — this is the original human speaker.</span></span></li>
+      <li><div class="rule-num">2</div><span>音声A〜Dを聴き、<b>自然さ（1〜5）</b>を評価してください。<br><span style="color:#94a3b8">Listen to A–D and rate each for <b>naturalness (1–5)</b>.</span></span></li>
+      <li><div class="rule-num">3</div><span>参照音声と最も<b>声が似ている</b>音声を選んでください。<br><span style="color:#94a3b8">Select the audio most similar in voice identity to the reference.</span></span></li>
+      <li><div class="rule-num">4</div><span>8問あります。所要時間は約15〜20分です。<br><span style="color:#94a3b8">There are 8 items. It takes about 15–20 minutes.</span></span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>基本情報 / Your Information</h2>
+    <label class="field-label">お名前またはID / Name or ID</label>
+    <input type="text" id="rater-name" placeholder="例: Taro Yamamoto">
+
+    <label class="field-label">日本語レベル / Japanese level</label>
+    <select id="jp-level">
+      <option value="">-- 選択してください --</option>
+      <option value="native">母国語 / Native</option>
+      <option value="n1">JLPT N1</option>
+      <option value="n2">JLPT N2</option>
+      <option value="other">その他 / Other</option>
+    </select>
+
+    <label class="field-label">年齢層 / Age group</label>
+    <select id="age-group">
+      <option value="">-- 選択してください --</option>
+      <option value="18-25">18–25</option>
+      <option value="26-35">26–35</option>
+      <option value="36-45">36–45</option>
+      <option value="46+">46+</option>
+    </select>
+
+    <p class="warn" id="warn-intro">すべての項目を入力してください / Please fill in all fields.</p>
+    <div class="btn-row" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="startSurvey()">開始する / Start →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PAGE: ITEM ══════════ -->
+<div id="pg-item" class="page">
+  <div class="progress-wrap"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+  <div class="progress-label" id="prog-label"></div>
+  <div id="item-mount"></div>
+  <p class="warn" id="warn-item">すべての評価を入力してから次へ進んでください。<br>Please complete all ratings before proceeding.</p>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="prevItem()" id="btn-prev">← 戻る</button>
+    <button class="btn btn-primary" onclick="nextItem()" id="btn-next">次へ →</button>
+  </div>
+</div>
+
+<!-- ══════════ PAGE: COMPLETE ══════════ -->
+<div id="pg-complete" class="page">
+  <div class="card" style="text-align:center;padding:48px 32px">
+    <div class="check-icon">✓</div>
+    <h1>完了しました！<br><span style="font-size:16px;font-weight:400;color:#64748b">Survey Completed!</span></h1>
+    <p style="margin-top:16px">ご協力ありがとうございました。<br>Thank you for your participation!</p>
+    <p style="margin-top:12px;font-size:13px;color:#94a3b8">回答は正常に送信されました。<br>Your responses have been submitted successfully.</p>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<script>
+// ══════════════════════════════════════════════════════
+// SURVEY DATA  (blind — codes A/B/C/D do NOT reveal system)
+// ══════════════════════════════════════════════════════
+const GD = id => `https://drive.google.com/file/d/${id}/preview`;
+
+const ITEMS = [
+  {
+    num: 1,
+    text: 'これは私の履歴書です、どうぞご覧ください。',
+    ref: GD('1RN0f0Tz0OLDTc4dPVtnHt4zCGgOkNjP1'),
+    clips: [
+      { code: 'A', src: GD('1KBeeUppDbXuBplRghqJAnzz6gnxtXJ5h') },
+      { code: 'B', src: GD('1wxEKjbSTlDl890tzJAG8G69ZfZs3w5h2') },
+      { code: 'C', src: GD('13wJi9FiMMTVknuPt7IqUJwiF8x_ozMnM') },
+      { code: 'D', src: GD('1GWlDoo-MtP4nzvdq8bJELh9upwyR6e6f') },
+    ]
+  },
+  {
+    num: 2,
+    text: '宋氏グループの面接は私にとって非常に重要です。',
+    ref: GD('1xH3YP5xthHg5ytAuygFX_k_WeeMhAlaU'),
+    clips: [
+      { code: 'A', src: GD('1woDVjzUMOnsnjz0nJD_urpvEf8ERkTL2') },
+      { code: 'B', src: GD('15buxzgcC55ut5Y9X2lZpHulLLWfwY0mh') },
+      { code: 'C', src: GD('1ZtFtMYSMfyc4ISzA0LnzIsZoEC2uIppZ') },
+      { code: 'D', src: GD('18rBs1pEoj0jedePS_CNIAxAjUb9HEGA-') },
+    ]
+  },
+  {
+    num: 3,
+    text: '母の死の真相を必ず突き止めます。',
+    ref: GD('1QuQ4_uCHXqUKkHcba7vGe5-tK-J_uuw-'),
+    clips: [
+      { code: 'A', src: GD('1xfHK4aX9uqYT4LzXpmPyD3ajfEQEeGP8') },
+      { code: 'B', src: GD('1PBMH-oD3Bf5mOvXxesq3G8PsVm02910h') },
+      { code: 'C', src: GD('1-WfaQha__jIexEQzNXjFNqQdCxa659Rw') },
+      { code: 'D', src: GD('1vHZVKGu852Oju7N0ngW6W_EeA8MVOB5n') },
+    ]
+  },
+  {
+    num: 4,
+    text: 'これは私の履歴書です、どうぞご覧ください。',
+    ref: GD('14TNsmeVvUdNqf1R1n4nLkvaLyVvQL9xj'),
+    clips: [
+      { code: 'A', src: GD('1U5TY2JJhtl60Yc7iW2mIl4Au3Ul8sLei') },
+      { code: 'B', src: GD('1ZU9bQyD5sqQTTXOZ9c7OGAmqvf_W2KOJ') },
+      { code: 'C', src: GD('1J-kJztdhV3i1ycxIC14xD4VsYGrd8VLJ') },
+      { code: 'D', src: GD('1jYJH1Iv2XjFVy1A-leRfqvoXFviKCl4y') },
+    ]
+  },
+  {
+    num: 5,
+    text: '宋氏グループの面接は私にとって非常に重要です。',
+    ref: GD('1ZxBTrGVHkfvY_1s9TBh5EqpDbszeUISA'),
+    clips: [
+      { code: 'A', src: GD('1C-m2QrqJD4JkbEbrrZ73_A_JeJmsxs5v') },
+      { code: 'B', src: GD('1IGhjFMAr7yMSa4oqFP-vFrez7ydmiBaG') },
+      { code: 'C', src: GD('1D7r0fOyj0Ynr0JEzpyqVckb4ASjwxN4U') },
+      { code: 'D', src: GD('1tT3z65_e6knBoX_nUe4NNG11SDfSvJJf') },
+    ]
+  },
+  {
+    num: 6,
+    text: '母の死の真相を必ず突き止めます。',
+    ref: GD('1saLI1I0YTqi3vvMIStcG-hbzjxoL-8jf'),
+    clips: [
+      { code: 'A', src: GD('1Z5JLtRyVHJRraQCZyYCCF8cTybCewmjp') },
+      { code: 'B', src: GD('1k6OfI6BfUkesSxFNQWlSVslqXbtQ02Jo') },
+      { code: 'C', src: GD('1RsISSgwexDG2Ypf1h5SdTkruC6dKIKh4') },
+      { code: 'D', src: GD('10h69CBtIxopQ__H2grnlJqZLSc9DE8I7') },
+    ]
+  },
+  {
+    num: 7,
+    text: '宋氏グループの面接は私にとって非常に重要です。',
+    ref: GD('1rv6cW4ryp0xoKQuH8QosrmviC2tp2ouH'),
+    clips: [
+      { code: 'A', src: GD('1cDLj_diawTO6MESCegBBhHhMdRKJM34O') },
+      { code: 'B', src: GD('1__0MkKYBqHSSRqYAq0fHIe3R2Vx1-UsO') },
+      { code: 'C', src: GD('1PQi7uCVhLu4EhK551Yu2JGVj7OB4KDbx') },
+      { code: 'D', src: GD('1Hi0jTikatHoG8bj7FHN9o5S5UCiz6IZn') },
+    ]
+  },
+  {
+    num: 8,
+    text: 'これは私の履歴書です、どうぞご覧ください。',
+    ref: GD('1uAp37tKboqJ7Ak6t-FdkkKdTE6LdGFRC'),
+    clips: [
+      { code: 'A', src: GD('16WV5-MK3h0jb8-xxU_7wXc717nds5v5B') },
+      { code: 'B', src: GD('1ZHaJQjH8xL72rrp43RQ2H1Oux6cxcz5t') },
+      { code: 'C', src: GD('1c-IUlkkrRS1OcbHFSrdmwJAj3ZYQbsoS') },
+      { code: 'D', src: GD('1OIOg36OEKBy7Rd2ajR1_r08yCe6GxyuD') },
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let currentItem = 0;
+let raterName = '', jpLevel = '', ageGroup = '';
+let sessionId = '';
+const answers = {};   // { "1": {A:3, B:4, C:2, D:5, sim:"A"}, ... }
+
+function genId() {
+  return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startSurvey() {
+  raterName  = document.getElementById('rater-name').value.trim();
+  jpLevel    = document.getElementById('jp-level').value;
+  ageGroup   = document.getElementById('age-group').value;
+
+  if (!raterName || !jpLevel || !ageGroup) {
+    document.getElementById('warn-intro').style.display = 'block';
+    return;
+  }
+  document.getElementById('warn-intro').style.display = 'none';
+  sessionId = genId();
+  currentItem = 0;
+  showPage('pg-item');
+  renderItem();
+}
+
+function prevItem() {
+  if (currentItem > 0) { currentItem--; renderItem(); }
+}
+
+function nextItem() {
+  // Validate current item
+  const item = ITEMS[currentItem];
+  const ans = answers[item.num] || {};
+  const allRated = item.clips.every(c => ans[c.code]);
+  const simChosen = !!ans.sim;
+
+  if (!allRated || !simChosen) {
+    document.getElementById('warn-item').style.display = 'block';
+    return;
+  }
+  document.getElementById('warn-item').style.display = 'none';
+
+  if (currentItem < ITEMS.length - 1) {
+    currentItem++;
+    renderItem();
+  } else {
+    submitSurvey();
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════
+function renderItem() {
+  const item = ITEMS[currentItem];
+  const n = currentItem + 1;
+  const total = ITEMS.length;
+  const pct = Math.round((n - 1) / total * 100);
+
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `音声 ${n} / ${total}`;
+  document.getElementById('btn-prev').style.visibility = currentItem === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = currentItem === total - 1 ? '送信する ✓' : '次へ →';
+
+  const saved = answers[item.num] || {};
+
+  let html = `<div class="card">
+    <h2>音声 ${n} / ${total}</h2>
+    <div class="sentence-box">${item.text}</div>
+
+    <div class="audio-block">
+      <div class="audio-label"><span class="tag ref">REF</span>参照音声 / Reference Audio</div>
+      <iframe class="player" src="${item.ref}" allow="autoplay" loading="lazy"></iframe>
+      <p style="font-size:12px;color:#94a3b8;margin-top:6px">↑ まずこれを聴いてください / Listen to this first</p>
+    </div>`;
+
+  for (const clip of item.clips) {
+    const savedNat = saved[clip.code] || 0;
+    html += `
+    <div class="audio-block">
+      <div class="audio-label"><span class="tag">${clip.code}</span>音声 ${n}-${clip.code}</div>
+      <iframe class="player" src="${clip.src}" allow="autoplay" loading="lazy"></iframe>
+      <p style="font-size:13px;font-weight:600;color:#334155;margin-top:12px">
+        自然さ / Naturalness:
+      </p>
+      <div class="rating-row">`;
+    for (let v = 1; v <= 5; v++) {
+      const chk = savedNat === v ? 'checked' : '';
+      html += `<label>
+          <input type="radio" name="nat_${item.num}_${clip.code}" value="${v}" ${chk}
+                 onchange="saveRating(${item.num},'${clip.code}',${v})">
+          <div class="rating-btn">${v}</div>
+        </label>`;
+    }
+    html += `</div>
+      <div class="scale-labels"><span>非常に不自然<br>Very unnatural</span><span>非常に自然<br>Very natural</span></div>
+    </div>`;
+  }
+
+  // Similarity question
+  html += `<div class="sim-question">
+    <p>参照音声と最も<b>声が似ている</b>のはどれですか？<br>
+       <span style="font-weight:400;color:#94a3b8;font-size:13px">Which audio sounds most similar in voice identity to the Reference?</span>
+    </p>
+    <div class="sim-options">`;
+  for (const clip of item.clips) {
+    const chk = saved.sim === clip.code ? 'checked' : '';
+    html += `<label>
+        <input type="radio" name="sim_${item.num}" value="${clip.code}" ${chk}
+               onchange="saveSim(${item.num},'${clip.code}')">
+        <div class="sim-btn">${clip.code}</div>
+      </label>`;
+  }
+  const chkNone = saved.sim === 'none' ? 'checked' : '';
+  html += `<label>
+      <input type="radio" name="sim_${item.num}" value="none" ${chkNone}
+             onchange="saveSim(${item.num},'none')">
+      <div class="sim-btn" style="font-size:12px">どれも<br>似ていない</div>
+    </label>
+    </div>
+  </div>
+  </div>`;
+
+  document.getElementById('item-mount').innerHTML = html;
+  document.getElementById('warn-item').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════
+// ANSWER SAVING
+// ══════════════════════════════════════════════════════
+function saveRating(itemNum, code, val) {
+  if (!answers[itemNum]) answers[itemNum] = {};
+  answers[itemNum][code] = val;
+}
+
+function saveSim(itemNum, val) {
+  if (!answers[itemNum]) answers[itemNum] = {};
+  answers[itemNum].sim = val;
+}
+
+// ══════════════════════════════════════════════════════
+// SUBMIT
+// ══════════════════════════════════════════════════════
+async function submitSurvey() {
+  document.getElementById('btn-next').disabled = true;
+  document.getElementById('btn-next').textContent = '送信中…';
+
+  const payload = {
+    session_id: sessionId,
+    rater_name: raterName,
+    jp_level:   jpLevel,
+    age_group:  ageGroup,
+    data:       answers,
+  };
+
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('Server error ' + res.status);
+    showPage('pg-complete');
+  } catch (e) {
+    alert('送信に失敗しました。もう一度お試しください。\nSubmission failed: ' + e.message);
+    document.getElementById('btn-next').disabled = false;
+    document.getElementById('btn-next').textContent = '送信する ✓';
+  }
+}
+</script>
+</body>
+</html>
