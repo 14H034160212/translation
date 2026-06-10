@@ -396,8 +396,25 @@ let raterName = '', jpLevel = '', ageGroup = '';
 let sessionId = '';
 const answers = {};   // { "1": {A:3, B:4, C:2, D:5, sim:"A"}, ... }
 
+const LS_KEY = 'tts_survey_state';
+
 function genId() {
   return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function saveState() {
+  localStorage.setItem(LS_KEY, JSON.stringify({
+    sessionId, raterName, jpLevel, ageGroup, currentItem, answers
+  }));
+}
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)); }
+  catch { return null; }
+}
+
+function clearState() {
+  localStorage.removeItem(LS_KEY);
 }
 
 // ══════════════════════════════════════════════════════
@@ -421,12 +438,43 @@ function startSurvey() {
   document.getElementById('warn-intro').style.display = 'none';
   sessionId = genId();
   currentItem = 0;
+  saveState();
   showPage('pg-item');
   renderItem();
 }
 
+// ── 页面加载时检查是否有未完成的进度 ──────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // 已完成：直接跳到完成页
+  if (localStorage.getItem(LS_KEY + '_done')) {
+    showPage('pg-complete');
+    return;
+  }
+  // 有未完成进度：询问是否恢复
+  const saved = loadState();
+  if (saved && saved.sessionId && saved.raterName) {
+    const resume = confirm(
+      `前回の途中から再開しますか？\nResume from where you left off?\n\n` +
+      `（${saved.raterName}、音声 ${saved.currentItem + 1}/8）\n\n` +
+      `「キャンセル」を押すと最初からやり直します。\nCancel = start over.`
+    );
+    if (resume) {
+      sessionId   = saved.sessionId;
+      raterName   = saved.raterName;
+      jpLevel     = saved.jpLevel;
+      ageGroup    = saved.ageGroup;
+      currentItem = saved.currentItem || 0;
+      Object.assign(answers, saved.answers || {});
+      showPage('pg-item');
+      renderItem();
+    } else {
+      clearState();
+    }
+  }
+});
+
 function prevItem() {
-  if (currentItem > 0) { currentItem--; renderItem(); }
+  if (currentItem > 0) { currentItem--; saveState(); renderItem(); }
 }
 
 function nextItem() {
@@ -444,6 +492,7 @@ function nextItem() {
 
   if (currentItem < ITEMS.length - 1) {
     currentItem++;
+    saveState();
     renderItem();
   } else {
     submitSurvey();
@@ -533,11 +582,13 @@ function renderItem() {
 function saveRating(itemNum, code, val) {
   if (!answers[itemNum]) answers[itemNum] = {};
   answers[itemNum][code] = val;
+  saveState();
 }
 
 function saveSim(itemNum, val) {
   if (!answers[itemNum]) answers[itemNum] = {};
   answers[itemNum].sim = val;
+  saveState();
 }
 
 // ══════════════════════════════════════════════════════
@@ -562,6 +613,8 @@ async function submitSurvey() {
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error('Server error ' + res.status);
+    clearState();
+    localStorage.setItem(LS_KEY + '_done', '1');
     showPage('pg-complete');
   } catch (e) {
     alert('送信に失敗しました。もう一度お試しください。\nSubmission failed: ' + e.message);
