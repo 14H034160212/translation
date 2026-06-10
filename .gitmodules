@@ -1,0 +1,11 @@
+[submodule "CosyVoice"]
+	path = CosyVoice
+	url = https://github.com/FunAudioLLM/CosyVoice.git
+
+[submodule "GPT-SoVITS"]
+	path = GPT-SoVITS
+	url = https://github.com/RVC-Boss/GPT-SoVITS.git
+
+[submodule "F5-TTS"]
+	path = F5-TTS
+	url = https://github.com/SWivid/F5-TTS.git
