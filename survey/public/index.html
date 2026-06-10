@@ -295,95 +295,95 @@
 // ══════════════════════════════════════════════════════
 // SURVEY DATA  (blind — codes A/B/C/D do NOT reveal system)
 // ══════════════════════════════════════════════════════
-const GD = id => `https://drive.google.com/file/d/${id}/preview`;
+const R2 = name => `https://pub-8337bd7f96fd452dba83af102da6a1d8.r2.dev/${name}`;
 
 const ITEMS = [
   {
     num: 1,
     text: 'これは私の履歴書です、どうぞご覧ください。',
-    ref: GD('1RN0f0Tz0OLDTc4dPVtnHt4zCGgOkNjP1'),
+    ref: R2('item01_spk2_REF.wav'),
     clips: [
-      { code: 'A', src: GD('1KBeeUppDbXuBplRghqJAnzz6gnxtXJ5h') },
-      { code: 'B', src: GD('1wxEKjbSTlDl890tzJAG8G69ZfZs3w5h2') },
-      { code: 'C', src: GD('13wJi9FiMMTVknuPt7IqUJwiF8x_ozMnM') },
-      { code: 'D', src: GD('1GWlDoo-MtP4nzvdq8bJELh9upwyR6e6f') },
+      { code: 'A', src: R2('item01_spk2_sent0_CosyVoice2.wav') },
+      { code: 'B', src: R2('item01_spk2_sent0_F5TTS.wav') },
+      { code: 'C', src: R2('item01_spk2_sent0_EdgeTTS.mp3') },
+      { code: 'D', src: R2('item01_spk2_sent0_GPTSoVITS.wav') },
     ]
   },
   {
     num: 2,
     text: '宋氏グループの面接は私にとって非常に重要です。',
-    ref: GD('1xH3YP5xthHg5ytAuygFX_k_WeeMhAlaU'),
+    ref: R2('item02_spk4_REF.wav'),
     clips: [
-      { code: 'A', src: GD('1woDVjzUMOnsnjz0nJD_urpvEf8ERkTL2') },
-      { code: 'B', src: GD('15buxzgcC55ut5Y9X2lZpHulLLWfwY0mh') },
-      { code: 'C', src: GD('1ZtFtMYSMfyc4ISzA0LnzIsZoEC2uIppZ') },
-      { code: 'D', src: GD('18rBs1pEoj0jedePS_CNIAxAjUb9HEGA-') },
+      { code: 'A', src: R2('item02_spk4_sent1_EdgeTTS.mp3') },
+      { code: 'B', src: R2('item02_spk4_sent1_CosyVoice2.wav') },
+      { code: 'C', src: R2('item02_spk4_sent1_GPTSoVITS.wav') },
+      { code: 'D', src: R2('item02_spk4_sent1_F5TTS.wav') },
     ]
   },
   {
     num: 3,
     text: '母の死の真相を必ず突き止めます。',
-    ref: GD('1QuQ4_uCHXqUKkHcba7vGe5-tK-J_uuw-'),
+    ref: R2('item03_spk4_REF.wav'),
     clips: [
-      { code: 'A', src: GD('1xfHK4aX9uqYT4LzXpmPyD3ajfEQEeGP8') },
-      { code: 'B', src: GD('1PBMH-oD3Bf5mOvXxesq3G8PsVm02910h') },
-      { code: 'C', src: GD('1-WfaQha__jIexEQzNXjFNqQdCxa659Rw') },
-      { code: 'D', src: GD('1vHZVKGu852Oju7N0ngW6W_EeA8MVOB5n') },
+      { code: 'A', src: R2('item03_spk4_sent2_F5TTS.wav') },
+      { code: 'B', src: R2('item03_spk4_sent2_EdgeTTS.mp3') },
+      { code: 'C', src: R2('item03_spk4_sent2_CosyVoice2.wav') },
+      { code: 'D', src: R2('item03_spk4_sent2_GPTSoVITS.wav') },
     ]
   },
   {
     num: 4,
     text: 'これは私の履歴書です、どうぞご覧ください。',
-    ref: GD('14TNsmeVvUdNqf1R1n4nLkvaLyVvQL9xj'),
+    ref: R2('item04_spk3_REF.wav'),
     clips: [
-      { code: 'A', src: GD('1U5TY2JJhtl60Yc7iW2mIl4Au3Ul8sLei') },
-      { code: 'B', src: GD('1ZU9bQyD5sqQTTXOZ9c7OGAmqvf_W2KOJ') },
-      { code: 'C', src: GD('1J-kJztdhV3i1ycxIC14xD4VsYGrd8VLJ') },
-      { code: 'D', src: GD('1jYJH1Iv2XjFVy1A-leRfqvoXFviKCl4y') },
+      { code: 'A', src: R2('item04_spk3_sent0_F5TTS.wav') },
+      { code: 'B', src: R2('item04_spk3_sent0_CosyVoice2.wav') },
+      { code: 'C', src: R2('item04_spk3_sent0_GPTSoVITS.wav') },
+      { code: 'D', src: R2('item04_spk3_sent0_EdgeTTS.mp3') },
     ]
   },
   {
     num: 5,
     text: '宋氏グループの面接は私にとって非常に重要です。',
-    ref: GD('1ZxBTrGVHkfvY_1s9TBh5EqpDbszeUISA'),
+    ref: R2('item05_spk7_REF.wav'),
     clips: [
-      { code: 'A', src: GD('1C-m2QrqJD4JkbEbrrZ73_A_JeJmsxs5v') },
-      { code: 'B', src: GD('1IGhjFMAr7yMSa4oqFP-vFrez7ydmiBaG') },
-      { code: 'C', src: GD('1D7r0fOyj0Ynr0JEzpyqVckb4ASjwxN4U') },
-      { code: 'D', src: GD('1tT3z65_e6knBoX_nUe4NNG11SDfSvJJf') },
+      { code: 'A', src: R2('item05_spk7_sent1_F5TTS.wav') },
+      { code: 'B', src: R2('item05_spk7_sent1_CosyVoice2.wav') },
+      { code: 'C', src: R2('item05_spk7_sent1_EdgeTTS.mp3') },
+      { code: 'D', src: R2('item05_spk7_sent1_GPTSoVITS.wav') },
     ]
   },
   {
     num: 6,
     text: '母の死の真相を必ず突き止めます。',
-    ref: GD('1saLI1I0YTqi3vvMIStcG-hbzjxoL-8jf'),
+    ref: R2('item06_spk8_REF.wav'),
     clips: [
-      { code: 'A', src: GD('1Z5JLtRyVHJRraQCZyYCCF8cTybCewmjp') },
-      { code: 'B', src: GD('1k6OfI6BfUkesSxFNQWlSVslqXbtQ02Jo') },
-      { code: 'C', src: GD('1RsISSgwexDG2Ypf1h5SdTkruC6dKIKh4') },
-      { code: 'D', src: GD('10h69CBtIxopQ__H2grnlJqZLSc9DE8I7') },
+      { code: 'A', src: R2('item06_spk8_sent2_F5TTS.wav') },
+      { code: 'B', src: R2('item06_spk8_sent2_EdgeTTS.mp3') },
+      { code: 'C', src: R2('item06_spk8_sent2_CosyVoice2.wav') },
+      { code: 'D', src: R2('item06_spk8_sent2_GPTSoVITS.wav') },
     ]
   },
   {
     num: 7,
     text: '宋氏グループの面接は私にとって非常に重要です。',
-    ref: GD('1rv6cW4ryp0xoKQuH8QosrmviC2tp2ouH'),
+    ref: R2('item07_spk1_REF.wav'),
     clips: [
-      { code: 'A', src: GD('1cDLj_diawTO6MESCegBBhHhMdRKJM34O') },
-      { code: 'B', src: GD('1__0MkKYBqHSSRqYAq0fHIe3R2Vx1-UsO') },
-      { code: 'C', src: GD('1PQi7uCVhLu4EhK551Yu2JGVj7OB4KDbx') },
-      { code: 'D', src: GD('1Hi0jTikatHoG8bj7FHN9o5S5UCiz6IZn') },
+      { code: 'A', src: R2('item07_spk1_sent1_CosyVoice2.wav') },
+      { code: 'B', src: R2('item07_spk1_sent1_F5TTS.wav') },
+      { code: 'C', src: R2('item07_spk1_sent1_GPTSoVITS.wav') },
+      { code: 'D', src: R2('item07_spk1_sent1_EdgeTTS.mp3') },
     ]
   },
   {
     num: 8,
     text: 'これは私の履歴書です、どうぞご覧ください。',
-    ref: GD('1uAp37tKboqJ7Ak6t-FdkkKdTE6LdGFRC'),
+    ref: R2('item08_spk7_REF.wav'),
     clips: [
-      { code: 'A', src: GD('16WV5-MK3h0jb8-xxU_7wXc717nds5v5B') },
-      { code: 'B', src: GD('1ZHaJQjH8xL72rrp43RQ2H1Oux6cxcz5t') },
-      { code: 'C', src: GD('1c-IUlkkrRS1OcbHFSrdmwJAj3ZYQbsoS') },
-      { code: 'D', src: GD('1OIOg36OEKBy7Rd2ajR1_r08yCe6GxyuD') },
+      { code: 'A', src: R2('item08_spk7_sent0_F5TTS.wav') },
+      { code: 'B', src: R2('item08_spk7_sent0_EdgeTTS.mp3') },
+      { code: 'C', src: R2('item08_spk7_sent0_GPTSoVITS.wav') },
+      { code: 'D', src: R2('item08_spk7_sent0_CosyVoice2.wav') },
     ]
   },
 ];
@@ -521,7 +521,9 @@ function renderItem() {
 
     <div class="audio-block">
       <div class="audio-label"><span class="tag ref">REF</span>参照音声 / Reference Audio</div>
-      <iframe class="player" src="${item.ref}" allow="autoplay" loading="lazy"></iframe>
+      <audio controls style="width:100%;margin-top:6px">
+        <source src="${item.ref}" type="audio/wav">
+      </audio>
       <p style="font-size:12px;color:#94a3b8;margin-top:6px">↑ まずこれを聴いてください / Listen to this first</p>
     </div>`;
 
@@ -530,7 +532,9 @@ function renderItem() {
     html += `
     <div class="audio-block">
       <div class="audio-label"><span class="tag">${clip.code}</span>音声 ${n}-${clip.code}</div>
-      <iframe class="player" src="${clip.src}" allow="autoplay" loading="lazy"></iframe>
+      <audio controls style="width:100%;margin-top:6px">
+        <source src="${clip.src}" type="${clip.src.endsWith('.mp3') ? 'audio/mpeg' : 'audio/wav'}">
+      </audio>
       <p style="font-size:13px;font-weight:600;color:#334155;margin-top:12px">
         自然さ / Naturalness:
       </p>
