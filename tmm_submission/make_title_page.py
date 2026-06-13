@@ -28,7 +28,7 @@ pdf.ln(8)
 # --- Authors ---
 pdf.set_font("Helvetica", "", 11)
 pdf.multi_cell(0, 6,
-               "Jing An (1, dagger), Qiming Bao (2, dagger, *), "
+               "Qiming Bao (2, dagger), Jing An (1, dagger, *), "
                "Rui-Yang Ju (3),\n"
                "Haofei Chang (4), Jinhua Su (4, 5), "
                "Yanbing Bai (4, double-dagger), Xin Qu (1)",
@@ -70,11 +70,11 @@ pdf.cell(0, 6, "Author Notes", ln=1)
 pdf.set_font("Helvetica", "", 10)
 notes = [
     "  dagger: These authors contributed equally as joint first "
-    "authors (Jing An and Qiming Bao).",
+    "authors (Qiming Bao and Jing An; Qiming Bao listed first).",
     "  double-dagger: Senior corresponding (PI) author "
     "(Yanbing Bai).",
     "  asterisk (*): Corresponding author for manuscript correspondence "
-    "(Qiming Bao).",
+    "(Jing An).",
 ]
 for n in notes:
     pdf.multi_cell(0, 5, n)

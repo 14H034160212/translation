@@ -2,13 +2,13 @@
 
 **To:** Editor-in-Chief, IEEE Transactions on Circuits and Systems for Video Technology (TCSVT)
 
-**From:** Qiming Bao (joint first author and first corresponding author) and Yanbing Bai (second corresponding author), on behalf of all co-authors
+**From:** Jing An (joint first author and corresponding author) and Yanbing Bai (senior/PI corresponding author), on behalf of all co-authors
 
-Qiming Bao — The University of Auckland, Auckland 1010, New Zealand — qiming.bao@auckland.ac.nz
+Jing An — School of AI and Language Sciences, Beijing International Studies University, Beijing 100024, China — jing.an@bisu.edu.cn
 
 Yanbing Bai — Center for Applied Statistics, School of Statistics, Renmin University of China, Beijing 100872, China — ybbai@ruc.edu.cn
 
-**Authorship:** Jing An and Qiming Bao are joint first authors (equal contribution); Qiming Bao and Yanbing Bai are joint corresponding authors.
+**Authorship:** Qiming Bao and Jing An are joint first authors (equal contribution; Qiming Bao listed first); Jing An and Yanbing Bai are corresponding authors.
 
 **Date:** [INSERT SUBMISSION DATE]
 
@@ -64,13 +64,15 @@ We thank you and the reviewers in advance for considering our submission and loo
 
 Sincerely,
 
-**Qiming Bao** — first corresponding author
+**Jing An** — corresponding author
 
-The University of Auckland, Auckland 1010, New Zealand
+School of AI and Language Sciences, Beijing International Studies University
 
-qiming.bao@auckland.ac.nz
+1 Dingfuzhuang Nanli, Chaoyang District, Beijing 100024, China
 
-**Yanbing Bai** — second corresponding author
+jing.an@bisu.edu.cn
+
+**Yanbing Bai** — senior/PI corresponding author
 
 Center for Applied Statistics, School of Statistics, Renmin University of China
 
