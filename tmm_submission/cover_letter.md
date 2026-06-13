@@ -1,6 +1,6 @@
-# Cover Letter — IEEE TCSVT Submission
+# Cover Letter — IEEE TMM Submission
 
-**To:** Editor-in-Chief, IEEE Transactions on Circuits and Systems for Video Technology (TCSVT)
+**To:** Editor-in-Chief, IEEE Transactions on Multimedia (TMM)
 
 **From:** Jing An (joint first author and corresponding author) and Yanbing Bai (senior/PI corresponding author), on behalf of all co-authors
 
@@ -18,11 +18,11 @@ Yanbing Bai — Center for Applied Statistics, School of Statistics, Renmin Univ
 
 Dear Editor,
 
-We are pleased to submit our manuscript, listed above, for consideration as a Regular Paper in *IEEE Transactions on Circuits and Systems for Video Technology*. The paper presents what is, to the best of our knowledge, the first end-to-end multimodal localization system specifically designed for Chinese short-form drama (*duanju*), spanning the three tightly coupled video-processing stages of visual subtitle recognition (frame-level OCR), audio transcription with adaptive multimodal fusion, neural machine translation, and zero-shot Japanese voice cloning for dubbed audio.
+We are pleased to submit our manuscript, listed above, for consideration as a Regular Paper in *IEEE Transactions on Multimedia*. The paper presents what is, to the best of our knowledge, the first end-to-end multimodal localization system specifically designed for Chinese short-form drama (*duanju*), spanning the tightly coupled stages of visual subtitle recognition (frame-level OCR), audio transcription with adaptive multimodal fusion, neural machine translation, and zero-shot Japanese voice cloning for dubbed audio.
 
-## Why TCSVT is the appropriate venue
+## Why TMM is the appropriate venue
 
-Short-form drama localization is fundamentally a circuits-and-systems-for-video problem: the subtitle text, the audio waveform, and the visual frame are jointly constrained, and progress on any single modality in isolation is insufficient for a deployable video pipeline. Our paper contributes (i) a confidence-adaptive OCR/ASR fusion algorithm that gates between modalities using ASR log-probabilities; (ii) a domain-adapted vision–language translation model that exploits visual context for register-aware Chinese–Japanese rendering; (iii) a controlled comparison of three zero-shot Japanese voice cloning systems with a reference-duration ablation; and (iv) a manually annotated 79-episode benchmark with end-to-end real-time-factor profiling. These contributions sit squarely within the TCSVT scope of video signal analysis, video-understanding systems, multimodal video processing, and applied learning for video content, and the work is unlikely to find a natural home at a single-modality venue (vision, NLP, or speech).
+Short-form drama localization is fundamentally a multimedia problem: the subtitle text, the audio waveform, and the visual frame are jointly constrained, and progress on any single modality in isolation is insufficient for a deployable end-to-end pipeline. Our paper contributes (i) a confidence-adaptive OCR/ASR fusion algorithm that gates between the visual and audio channels using ASR log-probabilities; (ii) a domain-adapted vision–language translation component, with a controlled study of how visual context affects translation in zero-shot versus fine-tuned settings; (iii) a controlled comparison of four zero-shot Japanese voice cloning systems combining automatic intelligibility/similarity metrics with a blind human listening study; and (iv) a manually annotated 79-episode cross-modal benchmark with end-to-end error-propagation analysis and real-time-factor profiling. These contributions sit squarely within the TMM scope of multimodal signal processing, cross-modal analysis and fusion, multimedia systems, and applied multimodal machine learning, and the work spans vision, language, and speech in a way that is unlikely to find a natural home at any single-modality venue.
 
 ## Relation to prior conference publication
 
@@ -51,7 +51,7 @@ We do not propose specific reviewers, but we suggest the editorial board conside
 
 We respectfully request that the following individuals not be invited as reviewers due to recent collaboration: *[INSERT NAMES IF ANY; LEAVE EMPTY OTHERWISE]*.
 
-## Compliance with TCSVT submission requirements
+## Compliance with TMM submission requirements
 
 - **Format:** IEEE `IEEEtran` class, `journal` option (two-column, single-blind).
 - **References:** IEEE Reference Format (`IEEEtran.bst`).

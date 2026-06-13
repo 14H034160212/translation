@@ -1,4 +1,4 @@
-"""Generate IEEE TCSVT Title Page PDF (separate file requested by editorial office)."""
+"""Generate IEEE TMM Title Page PDF (separate file requested by editorial office)."""
 from fpdf import FPDF
 
 
@@ -59,8 +59,7 @@ pdf.cell(40, 5, "Manuscript ID:", ln=0)
 pdf.cell(0, 5, "[to be assigned by ScholarOne]", ln=1)
 pdf.cell(40, 5, "Journal:", ln=0)
 pdf.cell(0, 5,
-         "IEEE Transactions on Circuits and Systems for "
-         "Video Technology (TCSVT)",
+         "IEEE Transactions on Multimedia (TMM)",
          ln=1)
 pdf.ln(4)
 
@@ -130,6 +129,6 @@ for k, v in sa:
     pdf.cell(28, 5, "  " + k, ln=0)
     pdf.multi_cell(0, 5, v)
 
-out = "/data/home/qbao775/translation/tcsvt_submission/title_page.pdf"
+out = "/data/home/qbao775/translation/tmm_submission/title_page.pdf"
 pdf.output(out)
 print("Wrote", out)
