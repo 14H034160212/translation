@@ -588,9 +588,11 @@ LoRA fine-tuning of \textbf{Qwen3-8B} (text-only, 8B) achieves BLEU $19.69\pm2.4
 To test whether fine-tuning benefits extend to the strongest baseline, we additionally LoRA fine-tuned \textbf{Gemma-4-12B} under the same 5-fold protocol (text-only, identical splits).
 This yields the best overall system: BLEU $30.75\pm1.84$ and chrF\texttt{++} $30.63\pm2.01$, a $+4.51$-point BLEU gain over its own zero-shot baseline (26.24) that is consistent across all five folds (Table~\ref{tab:per_fold}).
 Fine-tuning therefore helps at every scale we tested---4B ($+32\%$ relative), 8B ($+13\%$), and 12B ($+17\%$)---and the largest fine-tuned model sets the quality ceiling on this corpus.
-Notably, however, Gemma-4-12B's COMET is essentially unchanged by fine-tuning ($0.890$ FT vs.\ $0.892$ ZS) despite the large BLEU/chrF\texttt{++} gain: the zero-shot model is already semantically adequate, and fine-tuning primarily aligns surface lexical choice and register to the reference style rather than improving meaning.
-This separates two distinct effects of domain adaptation---semantic competence (saturated for large models in zero-shot) and stylistic conformity to the target subtitling conventions (improved by fine-tuning at all scales).
+Notably, however, Gemma-4-12B's COMET is essentially unchanged by fine-tuning ($0.890$ FT vs.\ $0.892$ ZS) despite the large BLEU/chrF\texttt{++} gain.
+The most likely reading is that the zero-shot model is already semantically adequate and fine-tuning primarily aligns surface lexical choice and register to the reference style rather than improving meaning; we note the alternative that COMET compresses differences in its upper range (both scores sit near $0.89$), which could also mask residual semantic change.
+Either way, the divergence between the surface metrics and COMET separates two effects of domain adaptation---semantic competence (already high for large models in zero-shot) and stylistic conformity to the target subtitling conventions (improved by fine-tuning at all scales).
 The practical implication is a quality--cost spectrum: a 4B fine-tune is deployable on a single consumer GPU, whereas the 12B fine-tune attains the best quality at roughly $3\times$ the parameter and memory cost.
+We emphasise that the contribution of the translation stage is not a claim of state-of-the-art translation from any single model, but (i) the systematic demonstration that domain LoRA fine-tuning yields consistent gains across the 4B--12B range on this previously unstudied short-drama domain, (ii) the resulting deployable quality--cost spectrum, and (iii) the finding that visual grounding---helpful zero-shot---is redundant under fine-tuning; the end-to-end pipeline, dataset, and confidence-adaptive fusion remain the system-level contributions.
 
 In contrast, \textbf{Qwen2.5-3B} shows a large apparent fine-tuning gain ($+9.52$ BLEU: ZS 3.58 $\to$ FT 13.10), where the low ZS BLEU stems from the model systematically prepending Japanese phonetic speaker tags absent from references. The elevated ZS COMET (0.71 vs.\ FT 0.64) confirms the translations are semantically adequate; LoRA fine-tuning corrects the formatting artifact and additionally adapts domain vocabulary.
 \textbf{M2M-100 (1.2B)}, a dedicated many-to-many MT model, achieves only 6.33 BLEU, revealing that conventional MT architectures trained on clean parallel data transfer poorly to colloquial, speaker-tagged subtitle text.
@@ -661,6 +663,7 @@ We use Resemblyzer~\cite{resemblyzer2020} as a lightweight, fully offline speake
 We acknowledge that automatic Spk-Sim is a proxy and may not fully align with human-perceived voice similarity, and we treat CER as the primary intelligibility metric.
 \textbf{EdgeTTS}~\cite{edgetts2024}, a commercial system with a fixed professionally tuned Japanese voice, is the most intelligible overall (CER 0.030, WER 0.056), as expected for a production service that performs no voice cloning.
 \textbf{GPT-SoVITS v3}~\cite{gptsovits2024} is by far the most intelligible of the three voice-cloning systems (CER 0.215, median 0.091)---roughly $5\times$ better than F5-TTS and over $20\times$ better than CosyVoice2 on mean CER---while its speaker similarity of 0.722 indicates strong voice identity preservation under cross-lingual cloning.
+GPT-SoVITS produced usable synthesis for 6 of the 12 speakers, so its average is computed over those 6; restricting all systems to this common 6-speaker subset leaves the ranking and gaps essentially unchanged (GPT-SoVITS CER 0.215, F5-TTS 1.269, CosyVoice2 6.514), confirming the comparison is not an artefact of differing speaker coverage.
 \textbf{F5-TTS}~\cite{chen2024f5tts} attains the highest speaker similarity (0.729) but produces largely unintelligible cross-lingual output (CER 1.152): transcriptions frequently contain garbled multilingual fragments, indicating that it preserves timbre but fails to produce fluent Japanese from Chinese references.
 \textbf{CosyVoice2-0.5B}~\cite{cosyvoice2_2024} exhibits the weakest intelligibility (mean CER 4.603, median 1.0); inspection of the transcriptions reveals a degenerate repetition failure mode on a subset of inputs, where the model emits long vowel loops instead of speech---likely a capacity limitation of the 0.5B variant under cross-lingual prompting.
 The dissociation between intelligibility and speaker similarity highlights an important trade-off: F5-TTS captures timbre marginally better than GPT-SoVITS (0.729 vs.\ 0.722) but at a catastrophic intelligibility cost.
@@ -672,21 +675,21 @@ To validate the automatic ranking perceptually, we additionally conducted a blin
 
 \begin{table}[t]
 \centering
-\caption{TTS evaluation. Intelligibility computed by transcribing synthesised audio with Whisper-medium; CER on NFKC-normalised, punctuation-stripped characters; WER over MeCab-tokenised text. Speaker similarity (Spk-Sim) is cosine similarity of Resemblyzer speaker embeddings between synthesized and reference audio (higher is better); N/A for EdgeTTS (fixed neural voice, no cloning). 12 speakers $\times$ 3 sentences per system ($n$\,=\,36); GPT-SoVITS computed on the 6 speakers with available synthesis ($n$\,=\,18). Best results per column in bold; best among voice-cloning systems underlined.}
+\caption{TTS evaluation. Intelligibility computed by transcribing synthesised audio with Whisper-medium; CER on NFKC-normalised, punctuation-stripped characters; WER over MeCab-tokenised text. We report both mean and median CER because the mean is inflated by a small number of degenerate outputs (e.g.\ CosyVoice2's repetition loops). Speaker similarity (Spk-Sim) is Resemblyzer embedding cosine (higher is better); N/A for EdgeTTS (fixed neural voice, no cloning). 12 speakers $\times$ 3 sentences per system ($n$\,=\,36); GPT-SoVITS on the 6 speakers with available synthesis ($n$\,=\,18). Best per column in bold; best among voice-cloning systems underlined.}
 \label{tab:tts}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{llccc}
+\begin{tabular}{llcccc}
 \toprule
-\textbf{Model} & \textbf{Method} & \textbf{Avg.\ WER}$\downarrow$ & \textbf{Avg.\ CER}$\downarrow$ & \textbf{Spk-Sim}$\uparrow$ \\
+\textbf{Model} & \textbf{Method} & \textbf{Avg.\ WER}$\downarrow$ & \textbf{Avg.\ CER}$\downarrow$ & \textbf{Med.\ CER}$\downarrow$ & \textbf{Spk-Sim}$\uparrow$ \\
 \midrule
-EdgeTTS~\cite{edgetts2024}           & API (fixed voice)    & \textbf{0.056} & \textbf{0.030} & {---}$^{\dagger}$ \\
-GPT-SoVITS v3~\cite{gptsovits2024}  & Zero-shot cloning    & \underline{0.248}$^{\ddagger}$ & \underline{0.215}$^{\ddagger}$ & 0.722 \\
-F5-TTS~\cite{chen2024f5tts}          & Flow matching (ZS)   & 0.998 & 1.152 & \textbf{0.729} \\
-CosyVoice2-0.5B~\cite{cosyvoice2_2024} & Flow matching (ZS) & 6.673 & 4.603 & 0.671 \\
+EdgeTTS~\cite{edgetts2024}           & API (fixed voice)    & \textbf{0.056} & \textbf{0.030} & \textbf{0.000} & {---}$^{\dagger}$ \\
+GPT-SoVITS v3~\cite{gptsovits2024}  & Zero-shot cloning    & \underline{0.248}$^{\ddagger}$ & \underline{0.215}$^{\ddagger}$ & \underline{0.091} & 0.722 \\
+F5-TTS~\cite{chen2024f5tts}          & Flow matching (ZS)   & 0.998 & 1.152 & 1.000 & \textbf{0.729} \\
+CosyVoice2-0.5B~\cite{cosyvoice2_2024} & Flow matching (ZS) & 6.673 & 4.603 & 1.000 & 0.671 \\
 \bottomrule
-\multicolumn{5}{l}{\footnotesize $^{\dagger}$EdgeTTS uses a single fixed neural voice (\texttt{ja-JP-NanamiNeural}) without}\\
-\multicolumn{5}{l}{\footnotesize speaker cloning; speaker similarity is not applicable.}\\
-\multicolumn{5}{l}{\footnotesize $^{\ddagger}$GPT-SoVITS averaged over the 6 speakers with available synthesis audio.}\\
+\multicolumn{6}{l}{\footnotesize $^{\dagger}$EdgeTTS uses a single fixed neural voice (\texttt{ja-JP-NanamiNeural}) without}\\
+\multicolumn{6}{l}{\footnotesize speaker cloning; speaker similarity is not applicable.}\\
+\multicolumn{6}{l}{\footnotesize $^{\ddagger}$GPT-SoVITS averaged over the 6 speakers with available synthesis audio.}\\
 \end{tabular}}
 \end{table}
 
@@ -740,7 +743,7 @@ This demonstrates that visual context provides meaningful information when the m
 
 This benefit does \emph{not}, however, carry over to fine-tuning.
 We fine-tuned Qwen3-VL-4B with four video frames per episode supplied during both training and inference, under the identical 5-fold protocol used for the text-only fine-tune (FT+V in Table~\ref{tab:per_fold}).
-The multimodal fine-tune achieves BLEU $15.58\pm6.49$ / chrF\texttt{++} $21.02\pm3.34$ / COMET $0.846\pm0.039$, statistically indistinguishable in mean from the text-only fine-tune ($15.70\pm4.42$ / $20.78\pm2.81$ / $0.843\pm0.026$) but with markedly higher cross-fold variance (BLEU std $6.49$ vs.\ $4.42$; per-fold differences range from $-6.2$ to $+9.2$ BLEU).
+The multimodal fine-tune achieves BLEU $15.58\pm6.49$ / chrF\texttt{++} $21.02\pm3.34$ / COMET $0.846\pm0.039$, statistically indistinguishable in mean from the text-only fine-tune ($15.70\pm4.42$ / $20.78\pm2.81$ / $0.843\pm0.026$; paired $t$-test on the five folds $t=-0.04$, $p=0.97$) but with markedly higher cross-fold variance (BLEU std $6.49$ vs.\ $4.42$; per-fold differences range from $-6.2$ to $+9.2$ BLEU).
 We attribute this to two factors: once LoRA has adapted the model to the domain subtitle distribution, the textual signal already captures most of the disambiguating context that visual frames provided in zero-shot; and the added visual tokens consume a share of the limited adapter capacity and inject episode-specific appearance noise, destabilising training on the 63-episode folds.
 In short, visual grounding helps a non-adapted model but is redundant---and mildly destabilising---once domain fine-tuning is applied, so our released pipeline uses the simpler and more stable text-only fine-tune.
 
