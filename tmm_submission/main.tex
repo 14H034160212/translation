@@ -3,8 +3,10 @@
 %% End-to-End Subtitle Recognition & Chinese-Japanese Translation
 %% with Speech Synthesis in Short Dramas
 %%
-%% TMM uses IEEEtran (journal) class. Compile with pdflatex + bibtex.
-%%   pdflatex main && bibtex main && pdflatex main && pdflatex main
+%% TMM uses IEEEtran (journal) class. Compile with XeLaTeX + bibtex
+%% (XeLaTeX is required for the Chinese/Japanese characters in the
+%%  qualitative-examples table; see the xeCJK package below).
+%%   xelatex main && bibtex main && xelatex main && xelatex main
 %%
 %% Note: TMM review submissions use double-column journal style.
 %%   Submission (review):  \documentclass[journal]{IEEEtran}
@@ -24,6 +26,13 @@
 \usepackage{array}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+
+% --- CJK support (Chinese source + Japanese translations in qualitative examples) ---
+% REQUIRES the XeLaTeX compiler (Overleaf: Menu -> Compiler -> XeLaTeX).
+% Noto Serif CJK SC covers both Chinese hanzi and Japanese kanji/kana and is
+% available on Overleaf and full TeX Live installations.
+\usepackage{xeCJK}
+\setCJKmainfont{Noto Serif CJK SC}
 
 \hyphenation{op-tical net-works semi-conduc-tor}
 
