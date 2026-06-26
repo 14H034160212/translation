@@ -31,7 +31,8 @@ pdf.multi_cell(0, 6,
                "Qiming Bao (2, dagger), Jing An (1, dagger, *), "
                "Rui-Yang Ju (3),\n"
                "Haofei Chang (4), Jinhua Su (4, 5), "
-               "Yanbing Bai (4, double-dagger), Xin Qu (1)",
+               "Yanbing Bai (4, double-dagger), Xin Qu (1), "
+               "Michael Witbrock (6)",
                align="C")
 pdf.ln(6)
 
@@ -46,6 +47,8 @@ affils = [
     "(4) Center for Applied Statistics, School of Statistics, "
     "Renmin University of China, Beijing 100872, China",
     "(5) Simashuhui Ltd., Beijing 100086, China",
+    "(6) School of Computer Science, "
+    "The University of Auckland, Auckland 1010, New Zealand",
 ]
 for line in affils:
     pdf.multi_cell(0, 5, line, align="C")
