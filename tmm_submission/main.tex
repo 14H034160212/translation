@@ -79,18 +79,11 @@ Subtitle recognition, subtitle translation, text-to-speech, Chinese short dramas
 %%
 \section{Introduction}
 \label{sec:introduction}
-\IEEEPARstart{T}{he} rapid rise of short-form video, and in particular the global expansion of Chinese short dramas (\textit{duanju}), has transformed the digital entertainment landscape into a new multimedia delivery paradigm centred on mobile consumption.
-Episodes are typically 3--15 minutes long, are produced at industrial cadence, and reach hundreds of millions of viewers across Mainland China, North America, Southeast Asia, Japan, and Korea, generating substantial demand for high-quality cross-lingual subtitle delivery and dubbing.
-Localizing this content is fundamentally a \emph{multimedia} task: the subtitle text, the audio waveform, and the visual frame are tightly coupled and jointly constrain how a translated, dubbed episode should look, sound, and read.
-Unlike conventional film or television, short dramas are characterized by fast-paced dialogue, dense subtitle coverage, and highly colloquial language tailored to vertical mobile viewing, with subtitle content changing 2--5 times per second during peak dialogue.
-Conventional subtitle translation pipelines, designed for slower-paced productions and treating recognition, translation, and synthesis as independent off-the-shelf components, are ill-equipped to deliver consistent, end-to-end localization for this regime.
+\IEEEPARstart{T}{he} global rise of Chinese short dramas (\textit{duanju})---3--15-minute episodes produced at industrial cadence and watched by hundreds of millions across China, North America, Southeast Asia, Japan, and Korea---has created strong demand for cross-lingual subtitling and dubbing.
+Localization here is fundamentally a \emph{multimedia} task in which subtitle text, audio, and visual frame are tightly coupled; yet short dramas feature fast-paced, colloquial dialogue with on-screen text changing 2--5 times per second, so conventional pipelines that chain independent off-the-shelf recognition, translation, and synthesis components are ill-equipped for consistent end-to-end localization.
 
 \textbf{Challenges in subtitle processing.}
-First, subtitle files for short dramas often lack consistent punctuation, which complicates sentence boundary detection and disrupts syntactic parsing in downstream translation systems~\cite{rehbein2020improving,donabauer2021making}.
-Second, the brevity and speed of short-drama dialogue means subtitles are highly fragmented; individual segments routinely omit subjects, discourse markers, or contextual referents, introducing ambiguity that is difficult to resolve without access to neighboring segments~\cite{li2021sentence,bawden2017evaluating}.
-Third, because each subtitle appears on screen for only a few seconds, recognition must be robust to motion blur, variable background complexity, and changing lighting conditions~\cite{yan2020end,yu2025eve}.
-Fourth, the audio track presents complementary difficulties: background music, overlapping speech, and the regional accent variation common in short-drama productions challenge standard automatic speech recognition (ASR) systems~\cite{liu2020adapting,yang2025speech}.
-Finally, short dramas frequently feature character-specific proper nouns (names, nicknames, and honorifics) that are poorly covered by generic OCR or ASR vocabulary, leading to systematic recognition errors that propagate through the translation stage.
+Short-drama localization poses five coupled difficulties: (i) inconsistent punctuation complicating sentence boundaries and parsing~\cite{rehbein2020improving,donabauer2021making}; (ii) highly fragmented segments that omit subjects and referents, ambiguous without neighbouring context~\cite{li2021sentence,bawden2017evaluating}; (iii) brief on-screen subtitles requiring recognition robust to motion blur, clutter, and lighting~\cite{yan2020end,yu2025eve}; (iv) background music, overlapping speech, and accent variation that challenge ASR~\cite{liu2020adapting,yang2025speech}; and (v) dense character-specific proper nouns poorly covered by generic OCR/ASR vocabularies, whose errors propagate to translation.
 
 \textbf{Proposed system.}
 To address these challenges holistically, we propose a novel end-to-end multimodal system that covers all stages of subtitle processing: recognition, translation, and speech synthesis.
@@ -103,16 +96,8 @@ Specifically:
 \end{itemize}
 
 \textbf{Relation to prior work.}
-This paper substantially extends a preliminary conference paper~\cite{an2026icassp}, which introduced the core OCR+ASR fusion framework and a LoRA fine-tuned Qwen2.5-3B translation model evaluated on a small test set.
-The present work makes the following additional contributions beyond~\cite{an2026icassp}:
-(1) a comprehensive OCR model benchmark covering seven VLM and traditional baselines not evaluated in~\cite{an2026icassp} (Qwen3-VL, InternVL2, GOT-OCR2.0, Florence-2, RapidOCR, EasyOCR, TrOCR);
-(2) a frame-rate ablation study demonstrating that 5\,fps is essential for high subtitle recall in fast-paced short dramas;
-(3) an upgraded two-parameter fusion strategy (ASR log-probability gate $\theta_p$ + OCR similarity gate $\theta_s$) whose hyperparameters are selected by a principled $10 \times 7$ grid search on a held-out validation subset, replacing the single fixed similarity threshold of~\cite{an2026icassp};
-(4) a significantly improved translation model---LoRA fine-tuned Qwen3-VL achieves cross-validated BLEU $15.70\pm4.42$ (vs.\ BLEU 9.84 in~\cite{an2026icassp}), alongside an extended translation benchmark covering eleven baselines including M2M-100~\cite{fan2021beyond}, Qwen3-8B~\cite{qwen3_2025}, NLLB-200, and Qwen2.5-7B;
-(5) a complete Japanese speech synthesis stage (GPT-SoVITS, CosyVoice2-0.5B, F5-TTS, EdgeTTS) with speaker-similarity ablation and a blind human listening study, absent from~\cite{an2026icassp};
-(6) an ablation study on visual context for translation, showing a +3.35 BLEU gain from multimodal over text-only input;
-(7) a comprehensive multimodal translation baseline evaluation covering InternVL3-8B, Qwen3.5-9B, Gemma-4-12B, and SeamlessM4T-v2-large, absent from~\cite{an2026icassp};
-and (8) a fine-grained error analysis of the fusion strategy using part-of-speech tagging and cross-stage error propagation, characterizing \emph{why} and \emph{how much} recognition improvement matters for downstream translation.
+This paper substantially extends a preliminary conference paper~\cite{an2026icassp}, which introduced the core OCR+ASR fusion framework and a LoRA fine-tuned Qwen2.5-3B translation model on a small test set.
+The present journal version adds an eight-backbone OCR benchmark and frame-rate ablation, a two-parameter confidence-gated fusion selected by grid search (replacing the single fixed threshold), a cross-validated eleven-baseline translation study with fine-tuning at the 4B/8B/12B scales, an entirely new speech-synthesis stage with four TTS systems and a blind human listening study, and a cross-stage error-propagation analysis. A detailed summary of differences accompanies the submission.
 
 \textbf{Contributions.}
 The contributions of this work are summarized as follows:
@@ -141,54 +126,28 @@ Section~\ref{sec:conclusion} concludes the paper.
 \label{sec:related}
 
 \subsection{Multimedia Subtitle Localization}
-Audiovisual translation has long been studied as a multimedia engineering problem rather than a pure-text one, since subtitle output must satisfy joint visual, temporal, and linguistic constraints that originate in different modalities of the same artefact~\cite{matusov2019challenges,karakanta2022mosub,tian2024mmsubtitle}.
-Industrial subtitling pipelines for streaming video services typically chain together off-the-shelf ASR, segmentation, MT, and TTS components, which compounds errors across stages and gives no principled way to reason about the joint visual--audio reliability of a hypothesized subtitle~\cite{matusov2019challenges}.
-For mobile short-form drama, the temporal density and proper-noun frequency further amplify these compounding errors, motivating the unified, confidence-aware multimodal pipeline we develop in this paper.
+Audiovisual translation is inherently a multimedia problem: subtitle output must satisfy joint visual, temporal, and linguistic constraints arising from different modalities of the same artefact~\cite{matusov2019challenges,karakanta2022mosub,tian2024mmsubtitle}.
+Industrial pipelines that chain off-the-shelf ASR, segmentation, MT, and TTS compound errors across stages and cannot reason about joint visual--audio reliability~\cite{matusov2019challenges}; for mobile short-form drama, high temporal density and proper-noun frequency amplify this, motivating our unified, confidence-aware pipeline.
 
 \subsection{Subtitle Recognition via OCR}
-Optical character recognition (OCR) for video subtitles has evolved from traditional template-matching approaches to deep-learning methods that handle arbitrary fonts, complex backgrounds, and variable lighting~\cite{yan2020end}.
-Recent work has increasingly leveraged large vision-language models (VLMs) for this task.
-Among these, Qwen2-VL~\cite{wang2024qwen2} integrates a high-resolution visual encoder with a large language model decoder, enabling robust text recognition under challenging conditions and maintaining strong contextual understanding of visual content.
-Its successor, Qwen3-VL~\cite{qwen3vl2025}, further improves multi-resolution processing and incorporates an extended pre-training corpus covering a wider diversity of text styles and languages.
-InternVL2~\cite{chen2024internvl} adopts a scalable vision-language architecture with dynamic resolution support, demonstrating competitive performance on scene-text benchmarks.
-GOT-OCR2.0~\cite{wang2024gotocr} proposes a unified end-to-end framework that handles a wide spectrum of OCR scenarios, including document, scene-text, and video-subtitle recognition.
-Benchmarking studies~\cite{nagaonkar2025benchmarking,shi2025mme} confirm that modern VLMs substantially outperform traditional methods on video OCR tasks, while also revealing remaining gaps in temporal consistency and proper-noun recognition.
-EVE~\cite{yu2025eve} specifically targets end-to-end subtitle extraction, demonstrating that treating the task as a structured sequence prediction problem can improve temporal coherence.
-
-Florence-2~\cite{florence2_2024} proposes a unified vision-language architecture capable of performing diverse vision tasks---including OCR---through a shared sequence-to-sequence framework, demonstrating strong generalization across document and scene-text benchmarks.
-Traditional OCR engines such as PaddleOCR (used here via RapidOCR~\cite{rapidocr2022}) and EasyOCR~\cite{easyocr2020} remain competitive on well-lit, high-contrast text but are more sensitive to background complexity and text style variation than VLM-based approaches.
+Video-subtitle OCR has moved from template matching to deep models robust to varied fonts, backgrounds, and lighting~\cite{yan2020end}, and increasingly to vision--language models (VLMs): Qwen2-VL~\cite{wang2024qwen2} and its successor Qwen3-VL~\cite{qwen3vl2025}, InternVL2~\cite{chen2024internvl}, and GOT-OCR2.0~\cite{wang2024gotocr}.
+Benchmarks confirm VLMs outperform traditional engines on video OCR while still struggling with temporal consistency and proper nouns~\cite{nagaonkar2025benchmarking,shi2025mme}; EVE~\cite{yu2025eve} targets end-to-end subtitle extraction.
+Florence-2~\cite{florence2_2024} is a general-purpose vision model, whereas traditional engines (PaddleOCR via RapidOCR~\cite{rapidocr2022}, EasyOCR~\cite{easyocr2020}) remain competitive on clean, high-contrast text but are more sensitive to background complexity.
 
 \subsection{Automatic Speech Recognition for Subtitles}
-ASR systems provide an alternative or complementary pathway to subtitle extraction from video.
-Whisper~\cite{radford2023robust} is a transformer-based encoder-decoder model trained on 680{,}000 hours of weakly supervised multilingual audio data, enabling robust transcription across languages, accents, and acoustic conditions.
-Its timestamp-prediction capability makes it particularly suitable for subtitle-aligned recognition, and its multilingual vocabulary provides coverage of proper nouns that may be missed by domain-specific models.
-The modular ASR framework of Liu \emph{et al.}~\cite{liu2020modular} demonstrates that end-to-end architectures can match or exceed traditional HMM-based pipelines on broadcast media.
-For TV and drama content specifically, Yang \emph{et al.}~\cite{yang2025speech} propose a video-guided post-correction approach that uses visual cues to refine ASR hypotheses, similar in spirit to our fusion strategy but applied at the post-hoc correction stage.
-Liu \emph{et al.}~\cite{liu2020adapting} address the mismatch between speech-recognition outputs and subtitle readability, highlighting the importance of punctuation restoration and sentence segmentation.
+Whisper~\cite{radford2023robust}, trained on 680{,}000 hours of weakly supervised multilingual audio, provides robust transcription with timestamp prediction well suited to subtitle alignment.
+End-to-end ASR can match HMM pipelines on broadcast media~\cite{liu2020modular}; video-guided post-correction refines ASR with visual cues~\cite{yang2025speech} (akin to our fusion but applied post-hoc), and punctuation/segmentation are key to subtitle readability~\cite{liu2020adapting}.
 
 \subsection{Subtitle Translation}
-Neural machine translation (NMT) for subtitles has benefited from the general advances in large language models~\cite{pramodya2025translating,wu2025combining,cui2025multilingual}.
-Context-aware translation~\cite{voita2018context,xiong2019modeling} is especially important for subtitles, where isolated segments lack the discourse coherence necessary for pronoun resolution and dialogue flow.
-Cherry \emph{et al.}~\cite{cherry2021subtitle} propose treating subtitle translation as markup-aware sequence translation, preserving formatting constraints and temporal boundaries.
-Qwen2.5~\cite{yang2024qwen2} provides strong multilingual capabilities, including Chinese--Japanese translation, and supports efficient adaptation via LoRA~\cite{hu2022lora}.
-Fine-tuning with domain-specific data has been shown to substantially improve translation quality on specialized corpora~\cite{li2024eliciting}.
-Multilingual models such as NLLB-200~\cite{nllb2022} offer an alternative paradigm based on dedicated MT pre-training across 200 languages, providing strong zero-shot performance on low-resource language pairs.
-M2M-100~\cite{fan2021beyond} addresses the problem of English-centric biases in multilingual MT by training directly on non-English language pairs, enabling high-quality direct translation between any of 100 languages.
-SeamlessM4T-v2~\cite{seamless2023} extends this to a massively multilingual audio-text model covering speech recognition, speech-to-text translation, and text-to-text translation within a single model, representing the state of the art in unified speech-and-text MT.
-The VAST system~\cite{chen2023vast} demonstrates the value of jointly modeling visual, audio, subtitle, and text modalities for video understanding, motivating our multimodal approach.
-Recent general-purpose multimodal large language models, including InternVL3~\cite{chen2024internvl}, Qwen3.5~\cite{qwen35_2025}, and Gemma-4~\cite{gemma2025}, have demonstrated strong performance on a wide range of vision-language tasks.
-Text-only language models such as Qwen3-8B~\cite{qwen3_2025} achieve competitive translation quality through instruction-following without requiring visual input.
-We evaluate all of these models as zero-shot translation baselines in Section~\ref{sec:translation_results}, finding that domain-specific fine-tuning of a 4B multimodal model outperforms nine of eleven baselines including all dedicated MT systems and comparable-size VLMs, while only Gemma-4-12B (3$\times$ parameters) and Qwen3-8B (2$\times$ parameters) achieve higher BLEU under zero-shot conditions---confirming the trade-off between model scale and domain adaptation.
+NMT for subtitles has advanced with large language models~\cite{pramodya2025translating,wu2025combining,cui2025multilingual}, where context-aware translation~\cite{voita2018context,xiong2019modeling} and markup-aware sequence handling~\cite{cherry2021subtitle} matter for discourse coherence.
+Qwen2.5~\cite{yang2024qwen2} supports Chinese--Japanese translation with efficient LoRA adaptation~\cite{hu2022lora}, and domain fine-tuning improves specialized-corpus quality~\cite{li2024eliciting}.
+Dedicated MT models include NLLB-200~\cite{nllb2022}, M2M-100~\cite{fan2021beyond}, and SeamlessM4T-v2~\cite{seamless2023}; multimodal modelling of video~\cite{chen2023vast} further motivates our approach.
+We evaluate recent VLMs (InternVL3~\cite{chen2024internvl}, Qwen3.5~\cite{qwen35_2025}, Gemma-4~\cite{gemma2025}) and text-only LLMs (Qwen3-8B~\cite{qwen3_2025}) as zero-shot baselines in Section~\ref{sec:translation_results}.
 
 \subsection{Text-to-Speech Synthesis}
-Neural TTS has achieved near-human naturalness through a variety of architectures~\cite{shen2023naturalspeech}.
-Zero-shot voice cloning---generating speech in an unseen speaker's voice from a short reference clip---has emerged as a key capability for multimedia localization.
-YourTTS~\cite{casanova2022yourtts} introduces a multilingual VITS-based framework for zero-shot multi-speaker TTS.
-GPT-SoVITS~\cite{gptsovits2024} extends this approach with a GPT-based acoustic model and SoVITS vocoder, supporting cross-lingual voice cloning with minimal reference audio.
-F5-TTS~\cite{chen2024f5tts} employs flow matching to achieve high-fidelity zero-shot synthesis, demonstrating strong performance across several languages.
-For production scenarios requiring reliability over customizability, API-based services such as Microsoft EdgeTTS~\cite{edgetts2024} offer a robust fallback.
-CosyVoice2~\cite{cosyvoice2_2024} proposes a scalable flow-matching TTS system with LLM-based text encoding, supporting cross-lingual zero-shot synthesis via language tokens; we evaluate CosyVoice2-0.5B as an additional TTS baseline.
-Voicebox~\cite{le2024voicebox} proposes a large-scale flow-matching TTS model with strong multilingual and multi-speaker capabilities, demonstrating that scaling is a viable path to improving zero-shot voice cloning.
+Neural TTS approaches near-human naturalness~\cite{shen2023naturalspeech}, and zero-shot voice cloning from short references is key for localization.
+YourTTS~\cite{casanova2022yourtts}, GPT-SoVITS~\cite{gptsovits2024}, F5-TTS~\cite{chen2024f5tts}, CosyVoice2~\cite{cosyvoice2_2024}, and Voicebox~\cite{le2024voicebox} span VITS- and flow-matching-based cross-lingual synthesis; for reliability, API services such as EdgeTTS~\cite{edgetts2024} provide a robust fallback.
+We benchmark GPT-SoVITS, F5-TTS, CosyVoice2-0.5B, and EdgeTTS.
 
 %%
 %% Dataset
@@ -206,17 +165,9 @@ The inclusion of speaker-ID annotations provides essential context for character
 
 \subsection{Dataset Characteristics}
 As shown in Table~\ref{tab:dataset}, the dataset comprises 79 paired episodes with a total duration of 130.56 minutes and 3{,}692 subtitle segments.
-Fig.~\ref{fig:subtitle_dist} shows the distribution of subtitle segments per episode; the number of segments per episode ranges from approximately 30 to 80, with a median of around 50.
+The number of subtitle segments per episode ranges from roughly 30 to 80 (median $\approx$50; distribution in the Supplementary Material).
 
-The dataset reflects the distinctive characteristics of short-drama subtitle content:
-\begin{itemize}
-  \item \textbf{High colloquialism}: Dialogue is informal and conversational, with heavy use of discourse particles, ellipsis, and idiomatic expressions.
-  \item \textbf{Minimal punctuation}: Subtitle files frequently omit sentence-final punctuation, complicating downstream segmentation and translation.
-  \item \textbf{Short segments}: Individual subtitle segments average approximately 8--12 Chinese characters, providing limited local context for translation.
-  \item \textbf{Proper noun density}: Character names, nicknames, and honorifics appear frequently and require consistent handling across episodes.
-\end{itemize}
-
-These characteristics make the dataset a challenging and realistic benchmark for end-to-end subtitle processing.
+The dataset reflects distinctive short-drama traits: high colloquialism (discourse particles, ellipsis, idioms), minimal sentence-final punctuation, short segments ($\sim$8--12 Chinese characters with limited local context), and dense character-specific proper nouns (names, nicknames, honorifics)---making it a challenging, realistic benchmark for end-to-end subtitle processing.
 
 \subsection{Dataset Scope and Planned Extensions}
 The current evaluation dataset covers a single drama series (\emph{Flash Marriage Lucky Grass / Destined}).
@@ -238,12 +189,7 @@ Speaker IDs & 12 & Avg. segments/episode & 46.7 \\
 \end{tabular}}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.95\columnwidth]{fig_2.png}
-\caption{Distribution of subtitle segments per episode across the 79-episode dataset.}
-\label{fig:subtitle_dist}
-\end{figure}
+
 
 %%
 %% Method
@@ -401,27 +347,10 @@ The equal weighting is a presentational convenience; the headline fusion result 
 \subsection{Subtitle Recognition: Model Comparison}
 \label{sec:ocr_comparison}
 
-Table~\ref{tab:recognition} presents the subtitle recognition performance of all evaluated models.
-Note that all OCR results use temporal deduplication (merging identical consecutive detections) to prevent inflated CER from repeated subtitle frames.
-Several findings emerge from this comparison.
-
-\textbf{RapidOCR}~\cite{rapidocr2022} achieves the highest BLEU score (86.3) among all 1-fps models, demonstrating that a well-engineered traditional pipeline can outperform VLMs on well-lit, high-contrast subtitle text.
-Its low CER (0.154) reflects reliable character-level recognition when subtitles are clearly visible.
-
-\textbf{InternVL2-4B}~\cite{chen2024internvl} achieves the highest character accuracy (0.985) among all models at 1\,fps, though its BLEU (83.5) is slightly below RapidOCR.
-This pattern suggests InternVL2 achieves high per-character accuracy but produces occasional segment-level errors that reduce BLEU.
-
-\textbf{Qwen3-VL-4B}~\cite{qwen3vl2025} at 1\,fps (CER 0.402, BLEU 73.6) is slightly better than Qwen2-VL-2B (CER 0.415, BLEU 71.2) but substantially below RapidOCR and InternVL2.
-This gap is primarily attributable to low frame recall: at 1\,fps, fast-paced dialogue results in many subtitle segments being missed between sampled frames.
-Increasing to 5\,fps dramatically improves performance (CER 0.086, CharAcc 0.982, BLEU 75.4), as analyzed in Section~\ref{sec:fps_ablation}.
-
-\textbf{TrOCR}~\cite{li2021trocr}, pre-trained primarily on English printed text, fails entirely on Chinese video subtitles (BLEU 0.0, CharAcc 0.126).
-When processing Chinese subtitle frames, it outputs hallucinated English words (e.g., ``TAX'', ``AMOUNT'') or random numbers, resulting in zero character overlap with the Chinese ground truth.
-This highlights the critical importance of language-appropriate pre-training for video OCR.
-
-\textbf{Florence-2-large}~\cite{florence2_2024}, a general-purpose vision-language model applied with the \texttt{<OCR>} task prompt on bottom-cropped subtitle regions, achieves a CER of 1.646 and CharAcc of 0.312---substantially below all task-specific OCR models.
-This result is expected: Florence-2 is designed as a domain-general vision model and is not optimized for Chinese video subtitle extraction.
-Its poor performance confirms that task-specific OCR models (both VLM-based and traditional) significantly outperform general-purpose vision-language models on this domain-constrained task, and motivates the use of specialized models in our pipeline.
+Table~\ref{tab:recognition} presents recognition performance; all OCR results use temporal deduplication (merging identical consecutive detections) to avoid inflated CER from repeated frames.
+At 1\,fps, the traditional \textbf{RapidOCR}~\cite{rapidocr2022} attains the best BLEU (86.3, CER 0.154) and \textbf{InternVL2-4B}~\cite{chen2024internvl} the best character accuracy (0.985, BLEU 83.5), showing that well-engineered traditional and VLM recognizers both excel on clean subtitle text.
+\textbf{Qwen3-VL-4B}~\cite{qwen3vl2025} at 1\,fps (CER 0.402) trails them due to low frame recall, but at 5\,fps it leads on CER (0.086, CharAcc 0.982; Section~\ref{sec:fps_ablation}).
+\textbf{TrOCR}~\cite{li2021trocr} (English-pretrained) fails on Chinese (BLEU 0.0), emitting hallucinated Latin tokens, and the general-purpose \textbf{Florence-2-large}~\cite{florence2_2024} scores far below task-specific models (CER 1.646)---confirming that language-appropriate, task-specific recognizers are essential for this domain.
 
 \begin{table}[t]
 \centering
@@ -450,20 +379,9 @@ Whisper-medium~\cite{radford2023robust} & ASR & 0.249 & 0.783 & 81.3 \\
 \subsection{Frame Sampling Rate Ablation}
 \label{sec:fps_ablation}
 
-A distinctive challenge in short-drama subtitle recognition is the high subtitle density: fast-paced dialogue may result in 2--5 subtitle changes per second, far exceeding the coverage afforded by 1\,fps sampling.
-To quantify this effect, we conduct an ablation study on episode \texttt{11.mp4}, comparing subtitle recall at 1, 2, and 5\,fps.
-
-The Supplementary Material reports the total number of detected characters as a proxy for subtitle recall.
-At 1\,fps, only 411 characters are detected---approximately 27.7\% of the 1{,}486 characters detected at 5\,fps.
-At 2\,fps, recall improves to 659 characters (44.3\% of 5\,fps), but remains substantially below the 5\,fps level.
-These results demonstrate that 1\,fps is inadequate for capturing the full subtitle content of fast-paced short dramas.
-
-Correspondingly, Table~\ref{tab:recognition} shows that Qwen3-VL-4B at 5\,fps achieves a CER of 0.086 and character accuracy of 98.2\%---substantially better than the 1\,fps setting (CER 0.402, CharAcc 0.914), where the latter CER is computed over the full corpus rather than the single ablation episode.
-This improvement confirms that higher sampling rates are essential for accurate OCR in this domain, and we recommend 5\,fps as the operational setting for production use.
-The recall ablation here uses a single representative episode to isolate the sampling-rate effect; the corpus-level CER reduction in Table~\ref{tab:recognition} corroborates the same conclusion across all 79 episodes.
-We note that the OCR comparison in Table~\ref{tab:recognition} evaluates all competing methods at 1\,fps and Qwen3-VL-4B at both 1\,fps and 5\,fps.
-This design choice is intentional: the per-frame accuracy of each model is unchanged by frame rate (the improvement comes from capturing more subtitle frames, not from higher per-frame fidelity), so 1\,fps results reflect each model's intrinsic accuracy.
-Applying 5\,fps to traditional engines (RapidOCR, EasyOCR, TrOCR) would yield proportionally more frames but the same per-frame accuracy, and would require solving the subtitle-line deduplication problem that Qwen3-VL handles via its temporal context prompt; we leave a uniform 5\,fps VLM comparison to future work.
+Short-drama dialogue changes 2--5 times per second, far exceeding 1\,fps coverage.
+On episode \texttt{11.mp4}, detected characters (a recall proxy) rise from 411 at 1\,fps (27.7\% of the 5\,fps total) through 659 at 2\,fps (44.3\%) to 1{,}486 at 5\,fps (Supplementary Material), and correspondingly Qwen3-VL-4B's corpus CER drops from 0.402 (1\,fps) to 0.086 (5\,fps); we therefore use 5\,fps in production.
+Competing methods are compared at 1\,fps because per-frame accuracy is rate-independent---the gain comes from capturing more frames, not higher per-frame fidelity---so 1\,fps reflects each model's intrinsic accuracy; a uniform 5\,fps VLM comparison, which also requires subtitle-line deduplication, is left to future work.
 
 
 
@@ -530,36 +448,12 @@ The system-level benefit of fusion over the ASR-only production baseline ($+10.8
 \subsection{Subtitle Translation: Model Comparison}
 \label{sec:translation_results}
 
-Table~\ref{tab:translation} presents the subtitle translation results across all evaluated models and configurations.
-All BLEU and chrF\texttt{++} values have been recomputed with a standardised evaluation protocol: line-number prefixes (\emph{e.g.}\, \texttt{1:~}) are stripped from both hypothesis and reference using the same regex, and BLEU is tokenised with \texttt{ja-mecab}; prior estimates differed across baselines and are superseded by these consistent values.
-Translation is evaluated at the \emph{document level}: each episode's subtitle lines are submitted as a single input and evaluated as a single translation unit against the full-episode Japanese reference.
-This avoids the segment-alignment problem that arises when a model reorders or merges lines, and better reflects the coherent discourse context used during inference; it is also consistent with how the fine-tuned model was trained (full-episode prompts).
-
-The fine-tuned \textbf{Qwen3-VL-4B (v2)} achieves BLEU $15.70\pm4.42$ (5-fold cross-validated mean$\pm$std), a $+32\%$ relative improvement over the same model's zero-shot baseline of 11.93 on the full 79 episodes.
-This demonstrates that domain-specific LoRA fine-tuning on 79 short-drama episodes produces a measurable quality gain even on held-out data.
-The variance across folds (std~4.42) reflects genuine domain heterogeneity: some episode groups are harder to translate than others, motivating the cross-validated estimate rather than a single-split result; a per-fold breakdown with vocabulary analysis is provided in Section~\ref{sec:discussion_translation} and Table~\ref{tab:per_fold}.
-
-Key factors driving the improvement are: (1) full-episode context (all subtitle lines in a single call) rather than isolated segment-by-segment translation; (2) an optimized LoRA configuration ($r=32$, $\alpha=64$) suited to the 4B parameter scale; and (3) 20 training epochs with a low learning rate ($5\times10^{-5}$).
-
-\textbf{Gemma-4-12B} (12B parameters, zero-shot, visual) achieves the highest BLEU (26.27) and chrF\texttt{++} (28.65) of all systems, including our fine-tuned model.
-This indicates that a general-purpose VLM at 3$\times$ the parameter count can leverage broader pre-training to compensate for the absence of domain adaptation.
-Notably, \textbf{Qwen3-8B} (text-only, zero-shot) achieves BLEU~17.46 with COMET~0.864, showing that larger text-only models remain competitive despite lacking visual input.
-Our 4B fine-tuned model achieves statistically comparable BLEU (15.70 vs.\ 17.46, $p=0.453$) at half the parameter count.
-
-LoRA fine-tuning of \textbf{Qwen3-8B} (text-only, 8B) achieves BLEU $19.69\pm2.49$ and COMET $0.860\pm0.016$ (5-fold cross-validated), a $+2.23$-point BLEU gain over its own zero-shot baseline (17.46) and $+3.99$-point above our fine-tuned 4B model (15.70). The COMET of 0.860 also exceeds the 4B FT COMET ($0.843$), confirming that the quality improvement is consistent across both n-gram overlap and neural semantic metrics. The 8B FT model wins 4/5 folds over its own ZS counterpart, demonstrating that LoRA fine-tuning is effective at both 4B and 8B parameter scales. The lower cross-fold variance ($\pm2.49$ vs.\ $\pm4.42$ for 4B FT) indicates that larger model capacity provides more robust domain adaptation across episode groups with varying vocabulary distributions.
-
-To test whether fine-tuning benefits extend to the strongest baseline, we additionally LoRA fine-tuned \textbf{Gemma-4-12B} under the same 5-fold protocol (text-only, identical splits).
-This yields the best overall system: BLEU $30.75\pm1.84$ and chrF\texttt{++} $30.63\pm2.01$, a $+4.51$-point BLEU gain over its own zero-shot baseline (26.24) that is consistent across all five folds (Table~\ref{tab:per_fold}).
-Fine-tuning therefore helps at every scale we tested---4B ($+32\%$ relative), 8B ($+13\%$), and 12B ($+17\%$)---and the largest fine-tuned model sets the quality ceiling on this corpus.
-Notably, however, Gemma-4-12B's COMET is essentially unchanged by fine-tuning ($0.890$ FT vs.\ $0.892$ ZS) despite the large BLEU/chrF\texttt{++} gain.
-The most likely reading is that the zero-shot model is already semantically adequate and fine-tuning primarily aligns surface lexical choice and register to the reference style rather than improving meaning; we note the alternative that COMET compresses differences in its upper range (both scores sit near $0.89$), which could also mask residual semantic change.
-Either way, the divergence between the surface metrics and COMET separates two effects of domain adaptation---semantic competence (already high for large models in zero-shot) and stylistic conformity to the target subtitling conventions (improved by fine-tuning at all scales).
-The practical implication is a quality--cost spectrum: a 4B fine-tune is deployable on a single consumer GPU, whereas the 12B fine-tune attains the best quality at roughly $3\times$ the parameter and memory cost.
-We emphasise that the contribution of the translation stage is not a claim of state-of-the-art translation from any single model, but (i) the systematic demonstration that domain LoRA fine-tuning yields consistent gains across the 4B--12B range on this previously unstudied short-drama domain, (ii) the resulting deployable quality--cost spectrum, and (iii) the finding that visual grounding---helpful zero-shot---is redundant under fine-tuning; the end-to-end pipeline, dataset, and confidence-adaptive fusion remain the system-level contributions.
-
-In contrast, \textbf{Qwen2.5-3B} shows a large apparent fine-tuning gain ($+9.52$ BLEU: ZS 3.58 $\to$ FT 13.10), where the low ZS BLEU stems from the model systematically prepending Japanese phonetic speaker tags absent from references. The elevated ZS COMET (0.71 vs.\ FT 0.64) confirms the translations are semantically adequate; LoRA fine-tuning corrects the formatting artifact and additionally adapts domain vocabulary.
-\textbf{M2M-100 (1.2B)}, a dedicated many-to-many MT model, achieves only 6.33 BLEU, revealing that conventional MT architectures trained on clean parallel data transfer poorly to colloquial, speaker-tagged subtitle text.
-\textbf{NLLB-200} (distilled 600M) achieves 2.97 BLEU, confirming that general-purpose multilingual MT models are poorly suited for this domain.
+Table~\ref{tab:translation} reports translation results; all BLEU/chrF\texttt{++} use a standardised \texttt{strip\_nums}+\texttt{ja-mecab} protocol and are evaluated at the document level (full-episode input vs.\ full-episode reference), which avoids segment-alignment artefacts and matches the fine-tuned model's training.
+Fine-tuned \textbf{Qwen3-VL-4B} reaches BLEU $15.70\pm4.42$ (5-fold CV), $+32\%$ over its zero-shot baseline (11.93), aided by full-episode context, an $r{=}32/\alpha{=}64$ LoRA, and a low learning rate; it is statistically comparable to zero-shot \textbf{Qwen3-8B} (17.46, $p=0.453$) at half the parameters.
+Fine-tuning \textbf{Qwen3-8B} reaches BLEU $19.69\pm2.49$ / COMET $0.860$ ($+2.23$ over its zero-shot), and fine-tuning the strongest baseline \textbf{Gemma-4-12B} reaches $30.75\pm1.84$ / chrF\texttt{++} $30.63$ ($+4.51$ over its zero-shot 26.24), the best overall---so domain LoRA fine-tuning helps at every scale (4B $+32\%$, 8B $+13\%$, 12B $+17\%$).
+Gemma's COMET is essentially unchanged by fine-tuning ($0.890$ vs.\ $0.892$) despite the large surface-metric gain, suggesting fine-tuning mainly aligns lexical choice and register rather than meaning (or reflects COMET's upper-range compression); the practical upshot is a quality--cost spectrum from a consumer-GPU 4B fine-tune to the best-quality 12B.
+We make no single-model state-of-the-art claim: the translation-stage contribution is this systematic cross-scale fine-tuning demonstration on a previously unstudied domain, while the pipeline, dataset, and fusion are the system-level contributions.
+Among the remaining baselines, \textbf{Qwen2.5-3B} fine-tuning gains $+9.52$ BLEU (ZS 3.58 $\to$ FT 13.10; the low ZS reflects a speaker-tag formatting artefact, ZS COMET 0.71), whereas dedicated MT models \textbf{M2M-100} (6.33) and \textbf{NLLB-200} (2.97) transfer poorly to colloquial speaker-tagged subtitles; per-baseline analysis continues in Section~\ref{sec:discussion_translation}.
 
 \begin{table}[t]
 \centering
@@ -593,29 +487,7 @@ NLLB-200 (600M)~\cite{nllb2022}     & ZS (text)      &  2.97 &  6.19 & 0.3781 \\
 \end{tabular}}
 \end{table}
 
-\begin{table}[t]
-\centering
-\caption{Per-fold BLEU on held-out validation episodes (5-fold CV, \texttt{strip\_nums}+\texttt{ja-mecab}, $n$\,=\,16/16/16/16/15). Within each FT/ZS pair, bold indicates the higher fold BLEU; for Gemma-4-12B, bold marks the best entry per fold across all models. FT+V denotes Qwen3-VL-4B fine-tuned with video frames as additional input.}
-\label{tab:per_fold}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lcccccc}
-\toprule
-\textbf{Model} & \textbf{Fold 0} & \textbf{Fold 1} & \textbf{Fold 2} & \textbf{Fold 3} & \textbf{Fold 4} & \textbf{Mean$\pm$Std} \\
-\midrule
-Qwen3-VL-4B FT (text)  & \textbf{19.68} & \textbf{19.75} &  9.58 & \textbf{16.53} & 12.94 & $15.70_{\pm4.42}$ \\
-Qwen3-VL-4B FT+V        & 18.51 & 19.78 &  7.12 & 10.35 & \textbf{22.16} & $15.58_{\pm6.49}$ \\
-Qwen3-VL-4B ZS          &  6.17 & 14.16 & \textbf{14.11} & 13.88 & 14.73 & $12.61_{\pm3.61}$ \\
-\midrule
-Gemma-4-12B FT (ours)    & \textbf{30.00} & \textbf{30.11} & \textbf{28.69} & \textbf{31.40} & \textbf{33.55} & $\textbf{30.75}_{\pm1.84}$ \\
-Gemma-4-12B ZS           & 25.69 & 24.96 & 27.57 & 26.38 & 26.59 & $26.24_{\pm0.98}$ \\
-Qwen3-8B ZS              & 17.82 & 18.00 & 18.01 & 15.64 & 17.58 & $17.41_{\pm1.00}$ \\
-Qwen3-8B FT (ours)       & 20.48 & 23.49 & 17.53 & 17.45 & 19.51 & $19.69_{\pm2.49}$ \\
-\bottomrule
-\multicolumn{7}{l}{\footnotesize Qwen3-VL-4B text FT$>$ZS on Folds 0,\,1,\,3; ZS wins on Folds 2\,\&\,4 (highest OOV). Adding visual}\\
-\multicolumn{7}{l}{\footnotesize frames to FT (FT+V) does not help on average ($15.58$ vs $15.70$) and raises variance. Gemma-4-12B}\\
-\multicolumn{7}{l}{\footnotesize FT$>$ZS on all five folds; Qwen3-8B FT$>$ZS on Folds 0,\,1,\,3,\,4.}\\
-\end{tabular}}
-\end{table}
+
 
 \subsection{Text-to-Speech Comparison}
 \label{sec:tts_results}
@@ -682,14 +554,10 @@ CosyVoice2-0.5B~\cite{cosyvoice2_2024}  & $1.52_{\pm0.88}$ & 2 (5\%) & 40 \\
 \end{tabular}}
 \end{table}
 
-Table~\ref{tab:tts_mos} reports the results.
-On naturalness, GPT-SoVITS ($3.08\pm1.14$) is statistically indistinguishable from the commercial EdgeTTS ($3.12\pm1.14$; Wilcoxon signed-rank test paired by rater--item, $z=-0.09$, $p=0.93$), and both significantly outperform F5-TTS ($1.80\pm1.02$) and CosyVoice2 ($1.52\pm0.88$; both $p<0.001$).
-Matching the naturalness of a commercially tuned fixed-voice system while performing zero-shot voice cloning is a substantially harder task, which makes this statistical tie a strong result for GPT-SoVITS.
-On perceived speaker similarity, GPT-SoVITS dominates with 45\% of all votes, against 15\% for F5-TTS and 5\% for CosyVoice2; EdgeTTS received no votes, confirming that a fixed commercial voice cannot serve dubbing scenarios that require speaker identity preservation.
-Notably, although F5-TTS attains the highest \emph{automatic} speaker similarity (Resemblyzer 0.729 vs.\ 0.722 in Table~\ref{tab:tts}), human raters preferred GPT-SoVITS for voice identity by a factor of three, suggesting that perceived similarity is degraded by F5-TTS's lower intelligibility and naturalness---embedding-based similarity alone does not fully capture perceptual voice identity.
-The 35\% ``none'' vote share reflects the intrinsic difficulty of cross-lingual (Chinese reference $\to$ Japanese synthesis) voice cloning from short references.
-Inter-rater reliability was ICC(2,1)\,=\,0.30 for single ratings and ICC(2,$k$)\,=\,0.68 for the 5-rater average (Krippendorff's ordinal $\alpha$\,=\,0.31), within the range typically observed for small MOS panels rating synthetic speech.
-Overall, the human study corroborates the automatic evaluation: GPT-SoVITS is the only system that simultaneously achieves commercial-grade naturalness and effective speaker cloning, supporting its adoption in our pipeline.
+GPT-SoVITS (MOS $3.08\pm1.14$) is statistically indistinguishable from commercial EdgeTTS ($3.12\pm1.14$; Wilcoxon paired by rater--item, $z=-0.09$, $p=0.93$) and both far exceed F5-TTS ($1.80$) and CosyVoice2 ($1.52$; both $p<0.001$)---matching a fixed commercial voice while performing zero-shot cloning is a strong result.
+On perceived similarity GPT-SoVITS dominates (45\% of votes vs.\ 15\% F5-TTS, 5\% CosyVoice2; EdgeTTS 0\%); although F5-TTS has marginally higher \emph{automatic} similarity (0.729 vs.\ 0.722 in Table~\ref{tab:tts}), raters preferred GPT-SoVITS 3:1, showing embedding similarity alone misses perceptual identity, and the 35\% ``none'' votes reflect the difficulty of cross-lingual cloning from short references.
+Inter-rater reliability is ICC(2,1)=0.30 / ICC(2,$k$)=0.68 (Krippendorff's ordinal $\alpha$=0.31), typical for small MOS panels.
+The human study thus corroborates the automatic ranking: GPT-SoVITS uniquely combines commercial-grade naturalness with effective cloning.
 
 \subsection{Ablation Studies}
 \label{sec:ablation}
@@ -701,53 +569,32 @@ To quantify the benefit of visual context for translation, we compare two varian
 (1) \textit{Text-only}: the model receives only the OCR-extracted Chinese subtitle text as input, and
 (2) \textit{Multimodal}: the model receives both the subtitle text and representative video frames from the episode.
 
-As shown in Table~\ref{tab:ablation_context}, in the \emph{zero-shot} setting the multimodal variant achieves BLEU 13.44, compared to 10.09 for text-only---a gain of +3.35 BLEU points.
+In the \emph{zero-shot} setting (Supplementary Material), the multimodal variant achieves BLEU 13.44 vs.\ 10.09 for text-only---a $+3.35$ BLEU gain.
 This demonstrates that visual context provides meaningful information when the model is not adapted to the domain, likely by disambiguating character identities, emotional tone, and scene type that is otherwise lost in the subtitle text alone.
 
 This benefit does \emph{not}, however, carry over to fine-tuning.
-We fine-tuned Qwen3-VL-4B with four video frames per episode supplied during both training and inference, under the identical 5-fold protocol used for the text-only fine-tune (FT+V in Table~\ref{tab:per_fold}).
+We fine-tuned Qwen3-VL-4B with four video frames per episode supplied during both training and inference, under the identical 5-fold protocol used for the text-only fine-tune (FT+V; per-fold results in the Supplementary Material).
 The multimodal fine-tune achieves BLEU $15.58\pm6.49$ / chrF\texttt{++} $21.02\pm3.34$ / COMET $0.846\pm0.039$, statistically indistinguishable in mean from the text-only fine-tune ($15.70\pm4.42$ / $20.78\pm2.81$ / $0.843\pm0.026$; paired $t$-test on the five folds $t=-0.04$, $p=0.97$) but with markedly higher cross-fold variance (BLEU std $6.49$ vs.\ $4.42$; per-fold differences range from $-6.2$ to $+9.2$ BLEU).
-We attribute this to two factors: once LoRA has adapted the model to the domain subtitle distribution, the textual signal already captures most of the disambiguating context that visual frames provided in zero-shot; and the added visual tokens consume a share of the limited adapter capacity and inject episode-specific appearance noise, destabilising training on the 63-episode folds.
-In short, visual grounding helps a non-adapted model but is redundant---and mildly destabilising---once domain fine-tuning is applied, so our released pipeline uses the simpler and more stable text-only fine-tune.
+We attribute this to redundancy and capacity: once LoRA adapts the model to the domain, text already carries most of the disambiguating context, while extra visual tokens consume limited adapter capacity and inject episode-specific noise, destabilising training on the 63-episode folds.
+Visual grounding thus helps a non-adapted model but is redundant under fine-tuning, so the released pipeline fine-tunes on text.
 
-\begin{table}[t]
-\centering
-\caption{Translation quality ablation: visual context vs.\ text-only input using Qwen3-VL zero-shot on 20 episodes. Absolute BLEU gain: +3.35.}
-\label{tab:ablation_context}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lcc}
-\toprule
-\textbf{Input Modality} & \textbf{BLEU}$\uparrow$ & \textbf{chrF++}$\uparrow$ \\
-\midrule
-Text-Only (OCR subtitles)       & 10.09 & 28.26 \\
-Multimodal (Video frames + Text) & \textbf{13.44} & \textbf{29.70} \\
-\bottomrule
-\end{tabular}}
-\end{table}
+
 
 \subsubsection{TTS Reference Audio Duration}
 \label{sec:ablation_tts}
 
-Zero-shot voice cloning requires a reference audio clip to capture the target speaker's timbre and prosody.
-The duration and quality of this reference clip directly affects speaker similarity in the synthesized output.
-We evaluate F5-TTS under two reference conditions: short references ($\sim$3 seconds) and long references ($\sim$10 seconds), measuring speaker similarity using cosine similarity of speaker embeddings.
-
-As reported in the Supplementary Material, longer reference audio significantly improves speaker similarity (0.64 $\to$ 0.71).
-This finding suggests that 3-second references---common in production scenarios where only short clean speech segments are available---are insufficient for reliable speaker identity transfer.
-We recommend collecting at least 8--10 seconds of clean reference audio per speaker to achieve satisfactory voice cloning quality.
+Zero-shot cloning quality depends on the reference clip.
+Comparing F5-TTS under $\sim$3\,s vs.\ $\sim$10\,s references, speaker similarity improves $0.64\to0.71$ (Supplementary Material); we therefore recommend at least 8--10\,s of clean reference audio per speaker.
 
 
 
 \subsection{Computational Cost and Efficiency}
 \label{sec:efficiency}
 
-For a multimedia localization pipeline to be practically deployable, end-to-end runtime is as important as quality.
-We therefore profile each stage on a single NVIDIA A100 SXM4 (80\,GB) using a representative short-drama episode (\texttt{11.mp4}), reporting wall-clock time relative to the input video duration (real-time factor, RTF; $\mathrm{RTF}<1$ is faster than real time).
-Whisper-medium ASR runs at $\mathrm{RTF}\!\approx\!0.08$ (a 1-minute clip is transcribed in about 5\,s).
-Qwen3-VL-4B OCR served via vLLM dominates the recognition cost: at 1\,fps it runs at $\mathrm{RTF}\!\approx\!0.5$, and at 5\,fps at $\mathrm{RTF}\!\approx\!2.4$, but with the dramatic recall improvement reported in the Supplementary Material.
-The frame-level OCR cache (Section~\ref{sec:arch}) eliminates redundant inference when an episode is re-processed, reducing the effective cost of the second and subsequent runs by more than $98\%$.
-LoRA-adapted Qwen3-VL translation processes a full episode (40--60 segments) in 6--10\,s, and zero-shot Japanese synthesis with GPT-SoVITS averages 1.4\,s of generation per second of output audio.
-Aggregating all stages, the pipeline produces a fully recognized, translated, and dubbed Japanese episode in roughly $3\times$--$4\times$ the input video duration on a single A100 GPU at 5\,fps OCR, which is acceptable for offline batch localization but motivates the latency-oriented future work in Section~\ref{sec:conclusion}.
+For deployability we profile each stage on one A100 (80\,GB) on episode \texttt{11.mp4} as a real-time factor (RTF; ${<}1$ is faster than real time).
+Whisper-medium runs at RTF $\approx0.08$; vLLM-served Qwen3-VL-4B OCR dominates (RTF $\approx0.5$ at 1\,fps, $\approx2.4$ at 5\,fps), though the frame-level cache (Section~\ref{sec:arch}) cuts re-processing cost by ${>}98\%$.
+LoRA translation takes 6--10\,s per episode and GPT-SoVITS synthesis $\approx1.4\times$ output duration.
+End-to-end, the pipeline produces a dubbed episode in $\approx3$--$4\times$ the input duration at 5\,fps---acceptable for offline batch localization and motivating the latency-oriented future work.
 
 %%
 %% Discussion
@@ -756,68 +603,35 @@ Aggregating all stages, the pipeline produces a fully recognized, translated, an
 \label{sec:discussion}
 
 \subsection{Analysis of Recognition Results}
-The most significant finding in the recognition stage is the critical role of frame sampling rate.
-At 1\,fps, even the best VLM achieves only 27.7\% subtitle recall, meaning that nearly three-quarters of subtitle content is missed.
-Increasing to 5\,fps brings Qwen3-VL-4B's CER from 0.402 to 0.086---a five-fold reduction---at the cost of increased inference time.
-This trade-off is well-suited to an offline processing pipeline where latency is not a primary constraint.
+Frame sampling rate is the dominant recognition factor: 1\,fps captures only 27.7\% of subtitle content, and raising it to 5\,fps cuts Qwen3-VL-4B CER five-fold ($0.402\to0.086$), a trade-off well suited to offline processing.
+The adaptive fusion resolves the complementary failure modes of OCR (weak temporal alignment) and ASR (phonetic proper-noun substitution); its $+10.8\%$ composite gain is concentrated in chrF\texttt{++} ($+10.3$), indicating mostly character-level corrections.
 
-The adaptive fusion strategy effectively resolves the complementary failure modes of OCR (poor temporal alignment, sensitivity to visual quality) and ASR (phonetic substitution errors for proper nouns).
-The +10.8\% composite score improvement primarily manifests in chrF++ (+10.3 points), indicating that OCR corrections are mostly character-level substitutions rather than insertion or deletion errors.
-
-\textbf{Fusion error type analysis.}
-To understand \emph{what} the fusion corrects, we conduct a word-level diff between the ASR-only and the adaptive fusion outputs using jieba part-of-speech tagging, classifying each substituted word as a proper noun (\texttt{nr}/\texttt{ns}/\texttt{nt}/\texttt{nz}), a number, or common vocabulary.
-The Supplementary Material reports the results across all 79 episodes.
-Of the 227 word-level changes made by the fusion module, 13.2\% involve proper nouns despite proper nouns comprising a much smaller fraction of Chinese vocabulary overall.
-Crucially, the GT correction rate for proper nouns is \textbf{60.0\%}---significantly higher than for common vocabulary (59.1\%), confirming that the fusion is \emph{not} randomly swapping tokens but is making linguistically motivated corrections targeted at rare, domain-specific entities.
-Concrete examples include \emph{李福}(nr)$\to$\emph{礼服}(n), where ASR misrecognized the common noun `formal wear' as a phonetically similar person name, and \emph{陆少庆}(nr)$\to$\emph{陆少}(nr), where ASR appended a spurious character to a character name.
+\textbf{Fusion error-type analysis.}
+A jieba POS-tagged word-level diff between ASR-only and fused outputs (all 79 episodes; Supplementary Material) shows that of 227 substitutions, proper nouns (13.2\% of changes) are corrected toward the ground truth at a 60.0\% rate, slightly above common vocabulary (59.1\%)---the fusion makes linguistically targeted corrections of rare entities, e.g.\ \emph{李福}(nr)$\to$\emph{礼服}(n) (a homophonic common noun mis-tagged as a name) and \emph{陆少庆}$\to$\emph{陆少} (a spurious appended character).
 
 
 
 \subsection{Analysis of Translation Results}
 \label{sec:discussion_translation}
-The cross-validated BLEU of fine-tuned Qwen3-VL ($15.70\pm4.42$) represents a $+32\%$ relative improvement over its own zero-shot baseline (11.93), with consistent gains across chrF\texttt{++} (20.78 vs.\ 17.72) and COMET (0.843 vs.\ 0.810).
-The cross-fold standard deviation of 4.42 reflects genuine domain heterogeneity across episode groups, which the cross-validated estimate properly captures rather than a single held-out split.
-
-Table~\ref{tab:per_fold} breaks down BLEU by fold and reveals a nuanced picture: the fine-tuned model outperforms its own zero-shot counterpart on three of five folds (Fold 0: 19.68 vs.\ 6.17; Fold 1: 19.75 vs.\ 14.16; Fold 3: 16.53 vs.\ 13.88), but underperforms on Fold 2 (9.58 vs.\ 14.11) and Fold 4 (12.94 vs.\ 14.73). Scaling LoRA fine-tuning to 8B parameters partially mitigates this OOV sensitivity: the 8B FT model achieves BLEU 17.53 on Fold~2 and 19.51 on Fold~4, compared to 9.58 and 12.94 for the 4B FT model, suggesting that larger pre-training coverage reduces vulnerability to novel episode vocabulary.
-A word-level out-of-vocabulary (OOV) analysis using jieba tokenisation reveals that Fold 2 and Fold 4 have the highest word-level OOV rates against their respective training splits (36.3\% and 35.7\%), compared to 33.0--33.1\% for Folds 0, 1, and 3.
-This suggests that the underperforming folds contain higher proportions of novel vocabulary---character names, slang terms, and idiomatic expressions not seen during LoRA fine-tuning---which the broader pre-training of the base Qwen3-VL-4B model handles more gracefully in zero-shot mode (see Table~\ref{tab:qual_examples}, Example~B, for a concrete instance).
-In contrast, Gemma-4-12B and Qwen3-8B achieve uniformly low cross-fold variance ($\pm$0.98 and $\pm$1.00, respectively), indicating that larger zero-shot models are more robust to vocabulary distribution shifts across episode groups.
-This finding motivates multi-series training as a direction for future work: augmenting the training set with episodes from diverse drama series would reduce OOV rates and is expected to improve fine-tuned model robustness across folds.
-The large fine-tuning gain for Qwen2.5-3B (ZS 3.58 $\to$ FT 13.10 BLEU) partly reflects the ZS model's phonetic speaker-tag artifact; yet even correcting for this, the FT gain confirms that LoRA fine-tuning is effective across model scales and that the FT 3B model (13.10) still outperforms a larger 7B zero-shot model (Qwen2.5-7B: 12.89).
-The +3.35-point BLEU gain from visual context supports the hypothesis that scene-level visual information is meaningful for subtitle translation and motivates future work on more tightly integrated multimodal translation architectures.
+Fine-tuned Qwen3-VL-4B improves over its zero-shot baseline by $+32\%$ BLEU ($15.70\pm4.42$ vs.\ 11.93), with consistent chrF\texttt{++} (20.78 vs.\ 17.72) and COMET (0.843 vs.\ 0.810) gains; the $\pm4.42$ cross-fold spread reflects genuine domain heterogeneity.
+The fine-tuned model beats its zero-shot counterpart on Folds 0/1/3 but loses on the two highest-OOV folds (Fold~2 and Fold~4 have 36.3\% and 35.7\% word-level OOV vs.\ 33.0--33.1\% elsewhere), where novel character names and slang favour the base model's broader pre-training.
+Scaling LoRA to 8B mitigates this (Fold~2 17.53, Fold~4 19.51 vs.\ 9.58/12.94 at 4B), and the larger zero-shot models show low cross-fold variance ($\pm0.98$ Gemma, $\pm1.00$ Qwen3-8B); augmenting training with multiple series to reduce OOV is a clear future direction.
+The large Qwen2.5-3B gain (ZS 3.58 $\to$ FT 13.10) partly reflects a zero-shot speaker-tag artefact, yet the fine-tuned 3B still exceeds the larger Qwen2.5-7B zero-shot (12.89).
+Visual context adds $+3.35$ BLEU in zero-shot, motivating tighter multimodal integration.
 
 \textbf{Qualitative analysis.}
-Table~\ref{tab:qual_examples} illustrates two characteristic error patterns.
+The Supplementary Material lists two characteristic error patterns (qualitative examples).
 In Example~A, the source phrase \textit{看来我们挺有缘} contains the culturally loaded term 缘 (a predestined fate or karmic connection between people).
 The fine-tuned model correctly maps it to the Japanese 縁 (\textit{en})---preserving both meaning and cultural nuance---whereas the zero-shot baseline substitutes 運 (\textit{un}, ``luck''), losing the relational concept.
 In Example~B, from Fold~2 (word OOV rate 36.3\%), the source 拜托 (``come on'' / ``please'') triggers a domain-specific hallucination in the fine-tuned model: it generates a sentence about the drama character ``White''---a fashion designer encountered in the training episodes---despite the source being a short exclamation.
 This is a direct symptom of the OOV-driven generalisation failure discussed above: the model over-fits to co-occurring characters in training episodes and mis-fires on validation episodes with different character distributions.
 
-\begin{table}[t]
-\centering
-\caption{Qualitative translation examples. Example A shows a culturally nuanced term translated correctly by FT but incorrectly by ZS. Example B shows an OOV-driven hallucination by FT that ZS avoids.}
-\label{tab:qual_examples}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{llp{4cm}p{4cm}p{4cm}}
-\toprule
-\textbf{Ex.} & \textbf{Chinese source} & \textbf{FT (ours)} & \textbf{ZS (Qwen3-VL-4B)} & \textbf{Reference} \\
-\midrule
-A & 看来我们挺有缘 & \textbf{きっと縁があるな} \newline (cultural term preserved) & きっと運が良いのだろう \newline (semantic error: 縁→運) & やっぱり縁があるのかもね \\
-\midrule
-B & 拜托 & お前はお母さんも有名なファッションデザイナーのWhiteさんだろ \newline (OOV hallucination) & お祈り & っていうか \\
-\bottomrule
-\end{tabular}}
-\end{table}
 
-The multimodal baselines (Table~\ref{tab:translation}) reveal an instructive pattern.
-\textbf{Gemma-4-12B} (12B parameters) achieves the highest scores in both regimes: zero-shot BLEU 26.27 / chrF\texttt{++} 28.65 / COMET 0.8917, and---when fine-tuned under our protocol---BLEU $30.75$ / chrF\texttt{++} $30.63$, the best overall (the scaling and fine-tuning analysis above details the COMET saturation effect).
-Fine-tuned Qwen3-VL-4B (15.70 BLEU, COMET~0.843) is below Gemma-4-12B on all three metrics but uses only one-third the parameters and is evaluated on held-out data under stricter cross-validated conditions.
-\textbf{Qwen3-8B} (text-only, 8B parameters, zero-shot) achieves 17.46 BLEU and 0.864 COMET, outperforming our fine-tuned 4B model on BLEU (17.46 vs.\ 15.70) but at twice the parameter count.
-This comparison illustrates an important efficiency trade-off: zero-shot inference with a larger text-only model achieves marginally higher BLEU, but domain-specific fine-tuning of a model one-half the size approaches comparable performance.
-InternVL3-8B (13.65 BLEU) lags behind despite a comparable parameter count, suggesting it is less suited to the structured subtitle format without domain adaptation.
-Qwen3.5-9B (3.49 BLEU) shows near-zero BLEU because its extended chain-of-thought reasoning exhausted the generation token budget before producing any Japanese output---a limitation that highlights the practical challenge of using reasoning-first models for structured generation tasks with fixed token budgets.
-M2M-100 1.2B (6.33 BLEU) and SeamlessM4T-v2-large T2TT (5.67 BLEU) confirm that conventional dedicated-MT architectures are poorly matched to colloquial speaker-tagged subtitle text.
-Taken together, our fine-tuned 4B model outperforms 9 of 11 zero-shot baselines, with only Gemma-4-12B (3$\times$ parameters) and Qwen3-8B (2$\times$ parameters, text-only) achieving higher BLEU under zero-shot conditions; among fine-tuned systems, the 12B and 8B fine-tunes rank above it, consistent with the scale--quality spectrum discussed above.
+
+Across baselines (Table~\ref{tab:translation}), \textbf{Gemma-4-12B} leads in both regimes (zero-shot 26.27 BLEU / 0.8917 COMET; fine-tuned 30.75 / chrF\texttt{++} 30.63, best overall).
+Our fine-tuned 4B (15.70, COMET 0.843) trails it but uses one-third the parameters under stricter cross-validation, while \textbf{Qwen3-8B} zero-shot (17.46, 0.864) edges it on BLEU at twice the size.
+InternVL3-8B (13.65) underperforms at comparable scale, and Qwen3.5-9B (3.49) collapses because chain-of-thought exhausts the token budget before emitting Japanese; M2M-100 (6.33) and SeamlessM4T-v2 (5.67) confirm dedicated MT transfers poorly to colloquial speaker-tagged subtitles.
+Overall the 4B fine-tune beats 9 of 11 zero-shot baselines, trailing only the larger Gemma-4-12B and Qwen3-8B.
 
 \textbf{Statistical significance.}
 We assess fold-level score differences using two-tailed paired $t$-tests across the five folds.
@@ -827,17 +641,10 @@ We note that with $n=5$ folds the tests have limited power; the corresponding Wi
 Bootstrap confidence intervals (1{,}000 resamples, fold-level) confirm: FT BLEU 95\%\,CI $[12.29,\,19.08]$ versus Qwen3-8B ZS $[16.55,\,17.97]$---the wide FT interval reflects genuine fold-to-fold heterogeneity, and the overlapping CIs support the conclusion of a non-significant difference at the five-fold resolution available.
 
 \textbf{Cross-stage error propagation.}
-The three pipeline stages are not independent: recognition errors in stage 1 propagate to the translation stage 2.
-To quantify this coupling, we first simulate recognition noise at various CER levels by randomly substituting characters in the oracle Chinese source text at a target substitution rate, then translating the corrupted text with the fold-0 Qwen3-VL-4B LoRA model and measuring BLEU against the Japanese reference.
-The simulated CER--BLEU relationship (Supplementary Material) is approximately linear in the 0--0.25 CER range.
-At the ASR-only operating point (CER~0.249), simulated translation BLEU degrades to 3.5 relative to a clean-source baseline of 13.1.
-The adaptive fusion reduces CER to 0.156, recovering approximately \textbf{+2.2 BLEU} in the simulation---demonstrating that the recognition improvements in stage 1 yield measurable benefits across the full pipeline.
-
-To complement the simulation, we conduct a direct end-to-end evaluation on the 16 fold-0 validation episodes by feeding three source conditions---oracle (ground-truth Chinese text), adaptive fusion output, and ASR-only Whisper output---to the Qwen3-VL-4B LoRA translation model and evaluating against the Japanese ground truth (Supplementary Material).
-Scores are computed at the document level (entire episode as a single translation unit); we report chrF\texttt{++} as the primary metric since it operates at character level and is more robust than BLEU at document granularity for Japanese.
-Note that document-level BLEU is inherently lower than the segment-level BLEU in Table~\ref{tab:translation} due to longer hypothesis lengths and increased lexical diversity; the two tables evaluate different granularities and are not directly comparable.
-The fusion condition achieves chrF\texttt{++} 13.56 versus 11.32 for ASR-only, recovering \textbf{$+$2.24 chrF\texttt{++} points}---61\% of the maximum gain relative to oracle (14.97)---directly confirming that the recognition improvement from stage~1 propagates as a measurable quality gain into stage~2.
-The document-level BLEU for ASR-only is 0.00 because systematic proper-noun substitutions in Whisper output propagate through translation and produce Japanese text with zero 4-gram overlap against the reference at episode granularity; this is a linguistic phenomenon (not an evaluation artefact) and is why we treat chrF\texttt{++} as the primary metric for this table.
+Recognition errors in stage~1 propagate to translation.
+Simulating recognition noise (random character substitution in the oracle source, then translating with the fold-0 LoRA model) gives an approximately linear CER--BLEU relation: at the ASR-only point (CER 0.249) translation BLEU falls to 3.5 vs.\ 13.1 for clean source, while the adaptive fusion (CER 0.156) recovers $\approx\textbf{+2.2}$ BLEU.
+A direct end-to-end evaluation on the 16 fold-0 episodes (document level) confirms this: fusion reaches chrF\texttt{++} 13.56 vs.\ 11.32 for ASR-only, recovering \textbf{$+2.24$} points (61\% of the oracle ceiling 14.97).
+Document-level BLEU for ASR-only is 0.00 because propagated proper-noun errors eliminate all episode-level 4-gram overlap---a genuine linguistic effect, hence chrF\texttt{++} is the primary metric here.
 
 
 
@@ -846,12 +653,9 @@ The document-level BLEU for ASR-only is 0.00 because systematic proper-noun subs
 \subsection{Qualitative Error Analysis}
 \label{sec:error_analysis}
 
-To complement the aggregate metrics, we manually inspected 100 randomly selected segments from the held-out validation fold, classifying remaining errors into four categories.
-\emph{(i) Proper-noun substitution} (38\% of errors): Whisper still substitutes character names with phonetically similar but incorrect tokens when ASR confidence happens to exceed $\theta_p$ but the speaker mumbles a name (e.g.\ rendering the female lead's name as a homophonic common noun). These are exactly the cases the OCR channel can correct; the failure mode is therefore a confidence-calibration issue rather than a fusion-design issue.
-\emph{(ii) Empty-frame OCR over-trigger} (22\%): Qwen3-VL occasionally hallucinates short on-screen text from background signage or production logos when no subtitle is present. The similarity gate $\theta_s$ filters most of these, but a small number leak through when the hallucinated text is coincidentally similar to the ASR hypothesis.
-\emph{(iii) Translation register mismatch} (24\%): even after fine-tuning, the model occasionally generates literal Japanese renderings of Chinese internet slang and idiomatic expressions where a native localized form would be preferred (for example, rendering trending hyperbolic slang such as \emph{juejuezi} literally rather than substituting a Japanese hyperbolic equivalent). Expanding the parallel corpus with explicitly localized slang pairs is the natural remedy.
-\emph{(iv) TTS prosodic flattening} (16\%): GPT-SoVITS occasionally produces flat, low-affect prosody on emotionally charged lines, particularly shouted or whispered dialogue, where the 8--10\,s reference clip cannot capture the full prosodic range. This is the dominant remaining gap relative to professional dubbing.
-This taxonomy aligns with the limitations identified below and indicates that error categories are largely orthogonal across pipeline stages, so future work targeting any single stage can be expected to yield additive end-to-end improvements.
+To complement aggregate metrics, we manually inspected 100 random held-out segments.
+Remaining errors fall into four largely orthogonal categories: \emph{(i) proper-noun substitution} (38\%), where confident-but-wrong ASR on mumbled names escapes the gate (a calibration, not design, issue, correctable by the OCR channel); \emph{(ii) empty-frame OCR over-trigger} (22\%), where hallucinated on-screen text occasionally passes the similarity gate; \emph{(iii) translation register mismatch} (24\%), where internet slang is rendered literally rather than localized; and \emph{(iv) TTS prosodic flattening} (16\%) on emotionally charged lines beyond the reference clip's prosodic range.
+Their orthogonality across stages means stage-specific improvements should be additive end-to-end.
 
 \subsection{Limitations}
 Several limitations of the current work should be noted.
