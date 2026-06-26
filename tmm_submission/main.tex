@@ -252,19 +252,12 @@ To assess the value of visual context, we additionally evaluate a multimodal var
 \subsection{Speech Synthesis}
 \label{sec:tts}
 
-The final stage of our system converts translated Japanese subtitles into natural-sounding speech, using the original Chinese audio as a timbre reference for each of the 12 speakers in the dataset.
-We evaluate four TTS approaches:
-
-\textbf{GPT-SoVITS}~\cite{gptsovits2024}: A reference-based voice cloning system that uses a GPT-based acoustic model and SoVITS vocoder. Given a short reference audio clip, it synthesizes speech that closely matches the speaker's timbre and prosody. We use the v3 release, which supports cross-lingual (Chinese-to-Japanese) zero-shot cloning.
-
-\textbf{F5-TTS}~\cite{chen2024f5tts}: A flow-matching TTS model that achieves high-fidelity zero-shot synthesis. F5-TTS models the speech generation process as a continuous normalizing flow, enabling precise control over prosody and timbre.
-
-\textbf{CosyVoice2}~\cite{cosyvoice2_2024}: Alibaba's scalable flow-matching TTS system with LLM-based text encoding, supporting cross-lingual zero-shot synthesis via language tokens (\texttt{<|ja|>}). We evaluate the 0.5B parameter variant.
-
-\textbf{EdgeTTS}~\cite{edgetts2024}: Microsoft's cloud-based TTS API, which provides pre-built Japanese voices without speaker-specific customization. This serves as a high-quality, off-the-shelf fallback when voice cloning fails or is computationally infeasible.
-
-Each TTS system receives the translated Japanese text and, where applicable, a reference audio clip from the target speaker.
-The generated Japanese audio is evaluated using Whisper-based automatic ASR to compute Word Error Rate (WER) as a proxy for intelligibility.
+The final stage converts the translated Japanese into speech, using each of the 12 speakers' original Chinese audio as a timbre reference, and evaluates four TTS systems:
+\textbf{GPT-SoVITS}~\cite{gptsovits2024} (v3, GPT acoustic model + SoVITS vocoder for reference-based cross-lingual cloning);
+\textbf{F5-TTS}~\cite{chen2024f5tts} (flow-matching zero-shot synthesis);
+\textbf{CosyVoice2-0.5B}~\cite{cosyvoice2_2024} (Alibaba's LLM-based flow-matching system with language tokens); and
+\textbf{EdgeTTS}~\cite{edgetts2024} (Microsoft's API with a fixed Japanese voice and no cloning, an off-the-shelf fallback).
+Each receives the Japanese text and, where applicable, a reference clip; outputs are scored by Whisper re-transcription.
 
 %%
 %% Experiments
@@ -388,33 +381,28 @@ Among the remaining baselines, \textbf{Qwen2.5-3B} fine-tuning gains $+9.52$ BLE
 
 \begin{table}[t]
 \centering
-\caption{Subtitle translation results. FT = LoRA fine-tuned; ZS = zero-shot; V = visual frames + text input. All BLEU/chrF\texttt{++} recomputed with consistent \texttt{strip\_nums}+\texttt{ja-mecab}; All ZS baselines evaluated on all 79 episodes. FT models ($^{\star}$) report 5-fold cross-validated mean$\pm$std. Bold: best per column.}
+\caption{Subtitle translation results. FT$^{\star}$ = LoRA fine-tuned (5-fold CV mean$\pm$std); ZS = zero-shot; +V = with visual frames. BLEU/chrF\texttt{++} use \texttt{strip\_nums}+\texttt{ja-mecab}. Bold: best per column. $^{\ddagger}$Qwen2.5-3B ZS prepends phonetic speaker tags (COMET 0.71 stays high); $^{\S}$Qwen3.5-9B chain-of-thought exhausted the token budget before emitting Japanese.}
 \label{tab:translation}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{llccc}
 \toprule
-\textbf{Model} & \textbf{Setting} & \textbf{BLEU}$\uparrow$ & \textbf{chrF++}$\uparrow$ & \textbf{COMET}$\uparrow$ \\
+\textbf{Model} & \textbf{Set.} & \textbf{BLEU}$\uparrow$ & \textbf{chrF++}$\uparrow$ & \textbf{COMET}$\uparrow$ \\
 \midrule
-Gemma-4-12B~\cite{gemma2025}    & FT (5-fold, text)$^{\star}$ & \textbf{30.75}$_{\pm1.84}$ & \textbf{30.63}$_{\pm2.01}$ & $0.890_{\pm0.010}$ \\
-Gemma-4-12B~\cite{gemma2025}    & ZS, V     & 26.27 & 28.65 & \textbf{0.8917} \\
-Qwen3-8B~\cite{qwen3_2025}     & FT (5-fold)$^{\star}$  & 19.69$_{\pm2.49}$ & 23.41$_{\pm1.28}$ & $0.860_{\pm0.016}$ \\
-Qwen3-8B~\cite{qwen3_2025}     & ZS (text)   & 17.46 & 21.03 & 0.8636 \\
-Qwen3-VL-4B~\cite{qwen3vl2025}   & FT (v2, text)$^{\star}$ & $15.70_{\pm4.42}$ & $20.78_{\pm2.81}$ & $0.843_{\pm0.026}$ \\
-InternVL3-8B~\cite{chen2024internvl} & ZS, V     & 13.65 & 17.76 & 0.7883 \\
-Qwen2.5-3B~\cite{yang2024qwen2}   & FT (text)   & 13.10 & 16.94 & 0.6437 \\
-Qwen2.5-7B~\cite{yang2024qwen2}   & ZS (text)   & 12.89 & 18.31 & 0.8287 \\
-Qwen3-VL-4B~\cite{qwen3vl2025}   & ZS (text)   & 11.93 & 17.72 & 0.8097 \\
-M2M-100 (1.2B)~\cite{fan2021beyond} & ZS (text)   & 6.33 & 11.28 & 0.5154 \\
-SeamlessM4T-v2-large~\cite{seamless2023} & ZS (T2TT) & 5.67 & 12.13 & 0.4968 \\
-Qwen2.5-3B~\cite{yang2024qwen2}   & ZS (text)   & 3.58$^{\ddagger}$ & 11.64 & 0.7134 \\
-Qwen3.5-9B~\cite{qwen35_2025}    & ZS, V     & 3.49$^{\S}$ & 11.79 & 0.4201 \\
-NLLB-200 (600M)~\cite{nllb2022}   & ZS (text)   & 2.97 & 6.19 & 0.3781 \\
+Gemma-4-12B~\cite{gemma2025}     & FT$^{\star}$ & \textbf{30.75}$_{\pm1.84}$ & \textbf{30.63}$_{\pm2.01}$ & $0.890$ \\
+Gemma-4-12B~\cite{gemma2025}     & ZS+V & 26.27 & 28.65 & \textbf{0.892} \\
+Qwen3-8B~\cite{qwen3_2025}       & FT$^{\star}$ & 19.69$_{\pm2.49}$ & 23.41$_{\pm1.28}$ & $0.860$ \\
+Qwen3-8B~\cite{qwen3_2025}       & ZS   & 17.46 & 21.03 & 0.864 \\
+Qwen3-VL-4B~\cite{qwen3vl2025}   & FT$^{\star}$ & $15.70_{\pm4.42}$ & $20.78_{\pm2.81}$ & $0.843$ \\
+InternVL3-8B~\cite{chen2024internvl} & ZS+V & 13.65 & 17.76 & 0.788 \\
+Qwen2.5-3B~\cite{yang2024qwen2}  & FT   & 13.10 & 16.94 & 0.644 \\
+Qwen2.5-7B~\cite{yang2024qwen2}  & ZS   & 12.89 & 18.31 & 0.829 \\
+Qwen3-VL-4B~\cite{qwen3vl2025}   & ZS   & 11.93 & 17.72 & 0.810 \\
+M2M-100~\cite{fan2021beyond}     & ZS   &  6.33 & 11.28 & 0.515 \\
+SeamlessM4T-v2~\cite{seamless2023} & ZS &  5.67 & 12.13 & 0.497 \\
+Qwen2.5-3B~\cite{yang2024qwen2}  & ZS   & 3.58$^{\ddagger}$ & 11.64 & 0.713 \\
+Qwen3.5-9B~\cite{qwen35_2025}    & ZS+V & 3.49$^{\S}$ & 11.79 & 0.420 \\
+NLLB-200~\cite{nllb2022}         & ZS   &  2.97 &  6.19 & 0.378 \\
 \bottomrule
-\multicolumn{5}{l}{\footnotesize All BLEU/chrF\texttt{++} scores recomputed with consistent \texttt{strip\_nums}+\texttt{ja-mecab} tokenisation.}\\
-\multicolumn{5}{l}{\footnotesize $^{\star}$FT (5-fold): 5-fold cross-validated mean$\pm$std on held-out episodes (KFold $n=5$, \texttt{seed=42}, alphabetical sort).}\\
-\multicolumn{5}{l}{\footnotesize $^{\ddagger}$Qwen2.5-3B ZS systematically prepends Japanese phonetic speaker tags absent from references, suppressing BLEU while COMET (0.71) remains high due to semantic fidelity.}\\
-\multicolumn{5}{l}{\footnotesize $^{\S}$Qwen3.5-9B extended chain-of-thought reasoning exhausted the 2{,}048-token generation budget before producing any Japanese output.}\\
-
 \end{tabular}}
 \end{table}
 
