@@ -196,12 +196,12 @@ Fig.~\ref{fig:system} shows the pipeline, comprising three functional stages (re
 
 Frame extraction and OCR results are cached to avoid redundant computation across episodes.
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\columnwidth]{fig_1_v2.png}
+\includegraphics[width=0.74\textwidth]{fig_1_v2.png}
 \caption{Architecture of the proposed end-to-end multimodal system: (1) subtitle recognition via parallel OCR (Qwen3-VL) and ASR (Whisper) with adaptive fusion; (2) translation using a LoRA fine-tuned Qwen3-VL; and (3) speech synthesis via zero-shot voice cloning. Stage~3 is new relative to the conference paper~\cite{an2026icassp}.}
 \label{fig:system}
-\end{figure}
+\end{figure*}
 
 \subsection{Subtitle Recognition}
 \label{sec:recognition}
@@ -547,21 +547,13 @@ Future work will extend the corpus to multiple series and genres, explore learne
 %% Reproducibility, Data Availability, Ethics
 %%
 \section*{Reproducibility Statement}
-We provide full details necessary to reproduce our experiments.
-Section~\ref{sec:method} specifies the model variants, prompt templates, and fusion thresholds; Section~\ref{sec:translation} reports LoRA hyperparameters, optimizer settings, batch size, and training schedule; Section~\ref{sec:experiments} reports hardware, software stack, and evaluation toolchain (SacreBLEU signature, COMET checkpoint, jiwer for WER/CER).
-The 5-fold cross-validation split protocol and seeds are described in Section~\ref{sec:translation_results}.
-Upon publication, we will release the inference and training scripts for the full pipeline together with the configuration files used for every reported number.
+Sections~\ref{sec:method}--\ref{sec:experiments} specify the model variants, prompts, fusion thresholds, LoRA hyperparameters, training schedule, hardware/software stack, and evaluation toolchain (SacreBLEU signature, COMET checkpoint, jiwer), and Section~\ref{sec:translation_results} gives the 5-fold split and seeds; inference/training scripts and configurations will be released on publication.
 
 \section*{Data Availability}
-The Chinese--Japanese short-drama corpus used in this work was provided by a commercial entertainment company under a research-use agreement that prohibits public redistribution of the underlying video, audio, and subtitle files.
-We will release a fully redacted metadata package (per-episode statistics, segment counts, fold assignments, and evaluation hashes) sufficient to reproduce our split protocol and to align future runs that obtain the source material via a comparable industry agreement.
-Synthetic example outputs (translation pairs and short anonymized synthesis clips) will be released for qualitative inspection.
+The corpus was provided by a commercial entertainment company under a research-use agreement prohibiting public redistribution of the video/audio/subtitle files. We will release a redacted metadata package (per-episode statistics, fold assignments, evaluation hashes) sufficient to reproduce the split protocol, plus synthetic example outputs for qualitative inspection.
 
 \section*{Ethics Statement}
-The dataset was collected from a single commercial short-drama series with explicit permission from the rights holder for research use; performers in the source material are professional actors who consented to broadcast distribution.
-Human annotators (Chinese subtitle reviewers and native Japanese translators) participated voluntarily and were compensated.
-Our zero-shot voice cloning experiments use the original actors' voices solely as a reference for cross-lingual dubbing of \emph{the same characters' lines} from the same series, which mirrors the licensed downstream use; the released synthesis examples will be limited to short, content-neutral lines and clearly labelled as synthetic.
-We caution that zero-shot voice cloning carries general misuse risk, and we therefore do not release reference-audio--to--cloned-voice mappings for the speakers.
+The dataset was collected from a single commercial series with the rights holder's permission; performers are professional actors who consented to broadcast distribution, and annotators participated voluntarily and were compensated. Our voice-cloning experiments use the actors' voices only to dub the same characters' lines from the same series, mirroring the licensed use; released samples are short, content-neutral, and labelled synthetic. As zero-shot cloning carries misuse risk, we do not release reference-to-cloned-voice mappings.
 
 %%
 %% Acknowledgment
