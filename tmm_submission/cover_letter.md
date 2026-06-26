@@ -28,12 +28,12 @@ Short-form drama localization is fundamentally a multimedia problem: the subtitl
 
 This manuscript is a substantial extension of our preliminary conference paper accepted to **IEEE ICASSP 2026** (Session MMSP-P23), which introduced an early version of the OCR+ASR fusion idea and a small-scale LoRA fine-tuned Qwen2.5-3B translation model on a subset of the data. The present journal version extends that work along six independent dimensions, contributing well beyond the new-material expectation under the IEEE Policy on Prior Publication for journal extensions of conference papers. A separate **Summary of Differences** document detailing the extensions has been uploaded with this submission as required by IEEE policy.
 
-1. **Comprehensive recognition benchmark** (Section 5.3): seven OCR backbones evaluated under matched conditions (Qwen3-VL, Qwen2-VL, InternVL2, GOT-OCR2.0, RapidOCR, EasyOCR, TrOCR) versus the single Qwen2-VL configuration in the conference version.
-2. **Frame-rate ablation** (Section 5.4): a new study quantifying the 1 fps → 5 fps recall gap from 27.7% → 100%, absent from the conference paper.
-3. **Upgraded fusion algorithm** (Section 4.2.3, Algorithm 1): replaces the conference paper's fixed similarity threshold with a confidence-adaptive gate using Whisper's segment log-probabilities, formalized as new pseudocode.
-4. **Substantially stronger translation results**: LoRA fine-tuned **Qwen3-VL-4B** achieves **BLEU 29.99 / chrF++ 39.34 / COMET 0.870**, versus the BLEU 9.84 reported in the conference paper. We additionally benchmark NLLB-200 and Qwen2.5-7B baselines.
-5. **Complete speech-synthesis stage** (Sections 4.4 and 5.7): GPT-SoVITS, F5-TTS, and EdgeTTS comparison with reference-duration ablation, **entirely new** relative to the conference paper.
-6. **New analyses**: visual-context translation ablation (+3.35 BLEU), computational cost / real-time-factor profiling, and a 100-segment qualitative error taxonomy.
+1. **Comprehensive recognition benchmark**: eight OCR backbones evaluated under matched conditions (Qwen3-VL, Qwen2-VL, InternVL2, GOT-OCR2.0, Florence-2, RapidOCR, EasyOCR, TrOCR) versus the single Qwen2-VL configuration in the conference version.
+2. **Frame-rate ablation**: a new study quantifying the 1 fps → 5 fps recall gap from 27.7% → 100%, absent from the conference paper.
+3. **Upgraded fusion algorithm** (Algorithm 1): replaces the conference paper's fixed similarity threshold with a two-parameter confidence-adaptive gate using Whisper's segment log-probabilities, selected by grid search and formalized as new pseudocode.
+4. **Cross-validated translation benchmark and fine-tuning scaling study**: LoRA fine-tuned **Qwen3-VL-4B** achieves 5-fold cross-validated **BLEU 15.70±4.42 / chrF++ 20.78±2.81 / COMET 0.843**, a +32% relative gain over its own zero-shot baseline (vs. BLEU 9.84 in the conference paper). We benchmark **eleven** baselines (incl. M2M-100, SeamlessM4T-v2, NLLB-200, InternVL3-8B, Qwen3.5-9B, Gemma-4-12B, Qwen3-8B) and fine-tune at multiple scales, with Gemma-4-12B reaching BLEU 30.75±1.84, showing domain fine-tuning helps across the 4B–12B range.
+5. **Complete speech-synthesis stage**: four zero-shot TTS systems (GPT-SoVITS, CosyVoice2-0.5B, F5-TTS, EdgeTTS) compared with both automatic metrics and a **blind five-rater human listening study**, plus a reference-duration ablation; **entirely new** relative to the conference paper.
+6. **New analyses**: visual-context translation ablation (+3.35 BLEU zero-shot; no benefit under fine-tuning), cross-stage error-propagation analysis, computational cost / real-time-factor profiling, and a 100-segment qualitative error taxonomy.
 
 ## Originality and ethical compliance
 
@@ -80,4 +80,4 @@ Center for Applied Statistics, School of Statistics, Renmin University of China
 
 ybbai@ruc.edu.cn
 
-on behalf of all co-authors: Jing An (joint first author), Rui-Yang Ju, Haofei Chang, Jinhua Su, and Xin Qu
+on behalf of all co-authors: Qiming Bao (joint first author), Jing An (joint first author), Rui-Yang Ju, Haofei Chang, Jinhua Su, Xin Qu, and Michael Witbrock

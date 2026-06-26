@@ -1,10 +1,10 @@
-# IEEE TCSVT 投稿包
+# IEEE TMM 投稿包
 
 **Manuscript:** *An End-to-End Multimodal System for Subtitle Recognition and Chinese–Japanese Translation with Speech Synthesis in Short Dramas*
 **Submission system:** ScholarOne Manuscripts — <https://mc.manuscriptcentral.com/tcsvt>
-**Generated:** 2026-05-09 (TCSVT version, ported from `tomm_submission/`)
+**Generated:** 2026-05-09 (TMM version, ported from `tomm_submission/`)
 
-> ⚠️ TCSVT 评审默认是 **single-blind**(reviewer 看不到作者,但作者署名在投稿稿件上)。本投稿包不再像 TOMM 版本那样做匿名化:`main.tex` 顶部已经写入完整作者名、单位与邮箱(IEEEtran `\thanks{}` 块),自引也以正常作者格式呈现。投稿前请按下方"main.pdf 合规清单"再核对一遍。
+> ⚠️ TMM 评审默认是 **single-blind**(reviewer 看不到作者,但作者署名在投稿稿件上)。本投稿包不再像 TOMM 版本那样做匿名化:`main.tex` 顶部已经写入完整作者名、单位与邮箱(IEEEtran `\thanks{}` 块),自引也以正常作者格式呈现。投稿前请按下方"main.pdf 合规清单"再核对一遍。
 
 ---
 
@@ -38,7 +38,7 @@
 - [ ] Abstract、IEEEkeywords 显示正常
 - [ ] 系统架构图 (`fig_1_v2.png`) 用 `figure*` 跨双栏
 - [ ] 参考文献由 `IEEEtran.bst` 编译
-- [ ] 自引 `an2026icassp` 以**正常作者署名**出现(TCSVT 是 single-blind,不需要 anonymize)
+- [ ] 自引 `an2026icassp` 以**正常作者署名**出现(TMM 是 single-blind,不需要 anonymize)
 - [ ] PDF 元数据中作者名段与 `main.tex` 一致
 - [ ] 所有图都有 caption,公式编号连贯,Algorithm 1 显示正常
 
@@ -96,7 +96,7 @@ python3 build_cover_letter.py
 
 ---
 
-## ScholarOne (TCSVT) 7 步流程速记
+## ScholarOne (TMM) 7 步流程速记
 
 | Step | 内容 |
 |---|---|
@@ -112,7 +112,7 @@ python3 build_cover_letter.py
 
 ## 提交完成后立即做
 
-1. 截图保存 Manuscript ID(形如 `TCSVT-XX-XXXX`)
+1. 截图保存 Manuscript ID(形如 `TMM-XXXXX`)
 2. 群发 7 位作者 Manuscript ID + ScholarOne 链接,提醒查收 co-author confirmation email
 3. 追 Jing An / Xin Qu 的 ORCID(接收前必须补齐)
 
@@ -120,7 +120,7 @@ python3 build_cover_letter.py
 
 ## 与 TOMM 投稿包的区别(对照表)
 
-| 项 | TOMM 版本 (`tomm_submission/`) | TCSVT 版本 (本目录) |
+| 项 | TOMM 版本 (`tomm_submission/`) | TMM 版本 (本目录) |
 |---|---|---|
 | LaTeX class | `acmart` (`acmsmall, manuscript, screen, review, anonymous`) | `IEEEtran` (`journal`) |
 | 评审模式 | Double-anonymous(双盲) | Single-blind(只对 reviewer 隐藏审稿意见,作者公开) |
@@ -130,7 +130,7 @@ python3 build_cover_letter.py
 | Keywords block | `\keywords{}` + CCS Concepts | `\begin{IEEEkeywords}` |
 | Title page | `title_page.tex` (manuscript ID `TOMM-2026-0446`) | `title_page.tex` (manuscript ID 待 ScholarOne 分配) |
 | Description of differences | ACM policy 30% threshold 描述 | IEEE policy "substantial extension" 描述,自引不再 anonymize |
-| Cover letter | TOMM scope, ACM submission requirements | TCSVT scope, IEEE submission requirements |
+| Cover letter | TOMM scope, ACM submission requirements | TMM scope, IEEE submission requirements |
 | `main.pdf` 状态 | 已编译 | **需在 Overleaf 重新编译** |
 
 如果 ScholarOne 任何一步报错,把错误信息发给我帮你排查。

@@ -1,8 +1,8 @@
-# TCSVT Submission
+# TMM Submission
 
-Source for IEEE Transactions on Circuits and Systems for Video Technology (TCSVT) submission, ported from the ACM TOMM version in [`tomm_submission/`](../tomm_submission/).
+Source for IEEE Transactions on Multimedia (TMM) submission, ported from the ACM TOMM version in [`tomm_submission/`](../tomm_submission/).
 
-For the full submission workflow (file list, ScholarOne steps, ORCID checklist, TOMM↔TCSVT diff), see [UPLOAD_GUIDE.md](UPLOAD_GUIDE.md).
+For the full submission workflow (file list, ScholarOne steps, ORCID checklist, TOMM↔TMM diff), see [UPLOAD_GUIDE.md](UPLOAD_GUIDE.md).
 
 ## Files
 
@@ -17,7 +17,7 @@ For the full submission workflow (file list, ScholarOne steps, ORCID checklist, 
 | `make_description_of_differences.py`, `description_of_differences.pdf` | Summary of differences vs. ICASSP 2026 conference version (required by IEEE Policy on Prior Publication). |
 | `original_presentation_icassp2026.pdf` | Camera-ready PDF of the prior conference paper, uploaded as supporting material. |
 | `supplementary.zip` | Same supplementary archive as the TOMM version (configs, prompts, evaluation toolchain, qualitative examples, dataset metadata, RTF profile). |
-| `UPLOAD_GUIDE.md` | ScholarOne upload checklist for TCSVT. |
+| `UPLOAD_GUIDE.md` | ScholarOne upload checklist for TMM. |
 
 ## Build
 
@@ -42,7 +42,7 @@ Top of [main.tex](main.tex) documents alternative `\documentclass` lines:
 
 - Class swapped from `acmart` to `IEEEtran` (journal mode, two-column).
 - Author block uses IEEE `\thanks{}` notes for affiliations and equal-contribution / corresponding-author marks.
-- TCSVT runs **single-blind** review, so author names and the self-citation are no longer anonymised. The cover letter, description of differences, and title page have been rewritten to match TCSVT/IEEE policy and the manuscript ID is left blank for ScholarOne to assign.
+- TMM runs **single-blind** review, so author names and the self-citation are no longer anonymised. The cover letter, description of differences, and title page have been rewritten to match TMM/IEEE policy and the manuscript ID is left blank for ScholarOne to assign.
 - Removed ACM-specific blocks: `\setcopyright`, `\acm{Journal,Volume,DOI,...}`, `CCSXML`, `\ccsdesc`, `\received`, `\Description{}`, `\begin{acks}`.
 - `\keywords{}` → `\begin{IEEEkeywords}...\end{IEEEkeywords}`.
 - `\bibliographystyle{ACM-Reference-Format}` → `\bibliographystyle{IEEEtran}`.
