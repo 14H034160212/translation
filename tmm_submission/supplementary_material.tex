@@ -4,6 +4,8 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \begin{document}
@@ -201,6 +203,128 @@ B & 拜托 & お前はお母さんも有名なファッションデザイナー�
 Text-Only (OCR subtitles)       & 10.09 & 28.26 \\
 Multimodal (Video frames + Text) & \textbf{13.44} & \textbf{29.70} \\
 \bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{algorithm}[t]
+\caption{Confidence-Adaptive OCR/ASR Fusion}
+\label{alg:fusion}
+\begin{algorithmic}[1]
+\Require Whisper segments $\mathcal{A}$, OCR detections $\mathcal{O}$, time tolerance $\delta$, log-prob threshold $\theta_p$, similarity threshold $\theta_s$
+\Ensure Fused subtitle sequence $\mathcal{S}$
+\State $\mathcal{S} \gets \emptyset$
+\For{each $a_i = (t_i^s, t_i^e, w_i, p_i) \in \mathcal{A}$}
+    \State $\mathcal{C}_i \gets \{\, o_j \in \mathcal{O} \mid \tau_j \in [t_i^s - \delta,\; t_i^e + \delta]\,\}$ \Comment{candidate OCR detections}
+    \If{$p_i \geq \theta_p$} \Comment{ASR is confident; trust Whisper}
+        \State $\hat{w}_i \gets w_i$
+    \Else
+        \State $o^\star \gets \arg\max_{o_j \in \mathcal{C}_i}\, \mathrm{sim}(o_j, w_i)$ \Comment{best OCR match}
+        \If{$\mathcal{C}_i \neq \emptyset$ \textbf{and} $\mathrm{sim}(o^\star, w_i) \geq \theta_s$}
+            \State $\hat{w}_i \gets o^\star$ \Comment{substitute OCR text, retain ASR timing}
+        \Else
+            \State $\hat{w}_i \gets w_i$ \Comment{fallback: keep ASR}
+        \EndIf
+    \EndIf
+    \State $\mathcal{S} \gets \mathcal{S} \cup \{(t_i^s, t_i^e, \hat{w}_i)\}$
+\EndFor
+\State \Return $\mathcal{S}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Computational Cost and Efficiency}
+\label{sec:efficiency}
+
+For deployability we profile each stage on one A100 (80\,GB) on episode \texttt{11.mp4} as a real-time factor (RTF; ${<}1$ is faster than real time).
+Whisper-medium runs at RTF $\approx0.08$; vLLM-served Qwen3-VL-4B OCR dominates (RTF $\approx0.5$ at 1\,fps, $\approx2.4$ at 5\,fps), though the frame-level cache (Section~\ref{sec:arch}) cuts re-processing cost by ${>}98\%$.
+LoRA translation takes 6--10\,s per episode and GPT-SoVITS synthesis $\approx1.4\times$ output duration.
+End-to-end, the pipeline produces a dubbed episode in $\approx3$--$4\times$ the input duration at 5\,fps---acceptable for offline batch localization and motivating the latency-oriented future work.
+
+
+
+\subsection{Qualitative Error Analysis}
+\label{sec:error_analysis}
+
+To complement aggregate metrics, we manually inspected 100 random held-out segments.
+Remaining errors fall into four largely orthogonal categories: \emph{(i) proper-noun substitution} (38\%), where confident-but-wrong ASR on mumbled names escapes the gate (a calibration, not design, issue, correctable by the OCR channel); \emph{(ii) empty-frame OCR over-trigger} (22\%), where hallucinated on-screen text occasionally passes the similarity gate; \emph{(iii) translation register mismatch} (24\%), where internet slang is rendered literally rather than localized; and \emph{(iv) TTS prosodic flattening} (16\%) on emotionally charged lines beyond the reference clip's prosodic range.
+Their orthogonality across stages means stage-specific improvements should be additive end-to-end.
+
+
+
+\begin{table}[t]
+\centering
+\caption{Human listening study results ($n$\,=\,5 JLPT-N1 raters, 8 items per system, blind randomised presentation). MOS = naturalness mean opinion score (1--5); Sim.\ votes = share of ``most similar to reference'' selections (40 votes total; 35\% of votes were ``none''). EdgeTTS uses a fixed voice and received no similarity votes. Best per column in bold.}
+\label{tab:tts_mos}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+\textbf{System} & \textbf{MOS}$\uparrow$ & \textbf{Sim.\ votes}$\uparrow$ & $n$ \\
+\midrule
+GPT-SoVITS v3~\cite{gptsovits2024}   & $3.08_{\pm1.14}$ & \textbf{18 (45\%)} & 40 \\
+EdgeTTS~\cite{edgetts2024}        & $\textbf{3.12}_{\pm1.14}$ & 0 (0\%)$^{\dagger}$ & 40 \\
+F5-TTS~\cite{chen2024f5tts}       & $1.80_{\pm1.02}$ & 6 (15\%) & 40 \\
+CosyVoice2-0.5B~\cite{cosyvoice2_2024} & $1.52_{\pm0.88}$ & 2 (5\%) & 40 \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize $^{\dagger}$EdgeTTS uses a fixed neural voice (\texttt{ja-JP-NanamiNeural}); cloning not applicable.}\\
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Statistical information of the proposed dataset.}
+\label{tab:dataset}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrlr}
+\toprule
+\multicolumn{2}{c}{\textbf{Dataset Composition}} & \multicolumn{2}{c}{\textbf{Subtitle Statistics}} \\
+\cmidrule(lr){1-2} \cmidrule(lr){3-4}
+Video clips (total) & 82 & Total duration (min) & 130.56 \\
+Paired episodes & 79 & Subtitle segments & 3{,}692 \\
+Speaker IDs & 12 & Avg. segments/episode & 46.7 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Subtitle recognition performance. VLMs and traditional OCR models evaluated at 1\,fps unless noted; all use temporal deduplication. Florence-2-large uses the \texttt{<OCR>} task prompt with bottom-30\% crop (domain-general model, shown for reference). Whisper (ASR) listed separately for reference. Best OCR/VLM results in bold.}
+\label{tab:recognition}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Type} & \textbf{CER}$\downarrow$ & \textbf{CharAcc}$\uparrow$ & \textbf{BLEU}$\uparrow$ \\
+\midrule
+Qwen3-VL-4B (5\,fps)~\cite{qwen3vl2025} & VLM & \textbf{0.086} & 0.982 & 75.4 \\
+RapidOCR~\cite{rapidocr2022}      & Trad. & 0.154 & 0.958 & \textbf{86.3} \\
+InternVL2-4B~\cite{chen2024internvl}  & VLM & 0.174 & \textbf{0.985} & 83.5 \\
+GOT-OCR2.0~\cite{wang2024gotocr}    & VLM & 0.365 & 0.959 & 78.2 \\
+EasyOCR~\cite{easyocr2020}       & Trad. & 0.390 & 0.942 & 74.1 \\
+Qwen3-VL-4B (1\,fps)~\cite{qwen3vl2025} & VLM & 0.402 & 0.914 & 73.6 \\
+Qwen2-VL-2B~\cite{wang2024qwen2}    & VLM & 0.415 & 0.908 & 71.2 \\
+TrOCR~\cite{li2021trocr}        & Trad. & 0.874 & 0.126 & 0.0 \\
+Florence-2-large~\cite{florence2_2024} & VLM & 1.646 & 0.312 & 2.1 \\
+\midrule
+Whisper-medium~\cite{radford2023robust} & ASR & 0.249 & 0.783 & 81.3 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{TTS evaluation. Intelligibility computed by transcribing synthesised audio with Whisper-medium; CER on NFKC-normalised, punctuation-stripped characters; WER over MeCab-tokenised text. We report both mean and median CER because the mean is inflated by a small number of degenerate outputs (e.g.\ CosyVoice2's repetition loops). Speaker similarity (Spk-Sim) is Resemblyzer embedding cosine (higher is better); N/A for EdgeTTS (fixed neural voice, no cloning). 12 speakers $\times$ 3 sentences per system ($n$\,=\,36); GPT-SoVITS on the 6 speakers with available synthesis ($n$\,=\,18). Best per column in bold; best among voice-cloning systems underlined.}
+\label{tab:tts}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Model} & \textbf{Method} & \textbf{Avg.\ WER}$\downarrow$ & \textbf{Avg.\ CER}$\downarrow$ & \textbf{Med.\ CER}$\downarrow$ & \textbf{Spk-Sim}$\uparrow$ \\
+\midrule
+EdgeTTS~\cite{edgetts2024}      & API (fixed voice)  & \textbf{0.056} & \textbf{0.030} & \textbf{0.000} & {---}$^{\dagger}$ \\
+GPT-SoVITS v3~\cite{gptsovits2024} & Zero-shot cloning  & \underline{0.248}$^{\ddagger}$ & \underline{0.215}$^{\ddagger}$ & \underline{0.091} & 0.722 \\
+F5-TTS~\cite{chen2024f5tts}     & Flow matching (ZS)  & 0.998 & 1.152 & 1.000 & \textbf{0.729} \\
+CosyVoice2-0.5B~\cite{cosyvoice2_2024} & Flow matching (ZS) & 6.673 & 4.603 & 1.000 & 0.671 \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize $^{\dagger}$EdgeTTS uses a single fixed neural voice (\texttt{ja-JP-NanamiNeural}) without}\\
+\multicolumn{6}{l}{\footnotesize speaker cloning; speaker similarity is not applicable.}\\
+\multicolumn{6}{l}{\footnotesize $^{\ddagger}$GPT-SoVITS averaged over the 6 speakers with available synthesis audio.}\\
 \end{tabular}}
 \end{table}
 
