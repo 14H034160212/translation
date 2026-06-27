@@ -2,13 +2,11 @@
 
 **To:** Editor-in-Chief, IEEE Transactions on Multimedia (TMM)
 
-**From:** Jing An (joint first author and corresponding author) and Yanbing Bai (senior/PI corresponding author), on behalf of all co-authors
+**From:** Jing An (joint first author and corresponding author), on behalf of all co-authors
 
 Jing An — School of AI and Language Sciences, Beijing International Studies University, Beijing 100024, China — jing.an@bisu.edu.cn
 
-Yanbing Bai — Center for Applied Statistics, School of Statistics, Renmin University of China, Beijing 100872, China — ybbai@ruc.edu.cn
-
-**Authorship:** Qiming Bao and Jing An are joint first authors (equal contribution; Qiming Bao listed first); Jing An and Yanbing Bai are corresponding authors.
+**Authorship:** Qiming Bao and Jing An are joint first authors (equal contribution; Qiming Bao listed first); Jing An is the corresponding author.
 
 **Date:** [INSERT SUBMISSION DATE]
 
@@ -72,12 +70,4 @@ School of AI and Language Sciences, Beijing International Studies University
 
 jing.an@bisu.edu.cn
 
-**Yanbing Bai** — senior/PI corresponding author
-
-Center for Applied Statistics, School of Statistics, Renmin University of China
-
-59 Zhongguancun Street, Haidian District, Beijing 100872, China
-
-ybbai@ruc.edu.cn
-
-on behalf of all co-authors: Qiming Bao (joint first author), Jing An (joint first author), Rui-Yang Ju, Haofei Chang, Jinhua Su, Xin Qu, and Michael Witbrock
+on behalf of all co-authors: Qiming Bao (joint first author), Jing An (joint first author), Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu, and Michael Witbrock

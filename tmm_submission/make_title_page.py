@@ -31,7 +31,7 @@ pdf.multi_cell(0, 6,
                "Qiming Bao (2, dagger), Jing An (1, dagger, *), "
                "Rui-Yang Ju (3),\n"
                "Haofei Chang (4), Jinhua Su (4, 5), "
-               "Yanbing Bai (4, double-dagger), Xin Qu (1), "
+               "Yanbing Bai (4), Xin Qu (1), "
                "Michael Witbrock (6)",
                align="C")
 pdf.ln(6)
@@ -73,8 +73,6 @@ pdf.set_font("Helvetica", "", 10)
 notes = [
     "  dagger: These authors contributed equally as joint first "
     "authors (Qiming Bao and Jing An; Qiming Bao listed first).",
-    "  double-dagger: Senior corresponding (PI) author "
-    "(Yanbing Bai).",
     "  asterisk (*): Corresponding author for manuscript correspondence "
     "(Jing An).",
 ]
@@ -103,34 +101,18 @@ pdf.set_font("Helvetica", "B", 11)
 pdf.cell(0, 6, "Corresponding Author (manuscript correspondence)", ln=1)
 pdf.set_font("Helvetica", "", 10)
 ca = [
-    ("Name:", "Qiming Bao"),
-    ("Affiliation:", "The University of Auckland"),
-    ("Address:", "38 Princes Street, Auckland 1010, New Zealand"),
-    ("Email:", "qiming.bao@auckland.ac.nz"),
-    ("ORCID:", "https://orcid.org/0000-0002-1000-7383"),
+    ("Name:", "Jing An"),
+    ("Affiliation:",
+     "School of AI and Language Sciences, "
+     "Beijing International Studies University"),
+    ("Address:",
+     "1 Dingfuzhuang Nanli, Chaoyang District, Beijing 100024, China"),
+    ("Email:", "jing.an@bisu.edu.cn"),
 ]
 for k, v in ca:
     pdf.cell(28, 5, "  " + k, ln=0)
-    pdf.cell(0, 5, v, ln=1)
-pdf.ln(4)
-
-# --- Senior PI corresponding author ---
-pdf.set_font("Helvetica", "B", 11)
-pdf.cell(0, 6, "Senior (PI) Corresponding Author", ln=1)
-pdf.set_font("Helvetica", "", 10)
-sa = [
-    ("Name:", "Yanbing Bai"),
-    ("Affiliation:",
-     "Center for Applied Statistics, School of Statistics, "
-     "Renmin University of China"),
-    ("Address:",
-     "59 Zhongguancun Street, Haidian District, Beijing 100872, China"),
-    ("Email:", "ybbai@ruc.edu.cn"),
-    ("ORCID:", "https://orcid.org/0000-0001-5223-9425"),
-]
-for k, v in sa:
-    pdf.cell(28, 5, "  " + k, ln=0)
     pdf.multi_cell(0, 5, v)
+pdf.ln(4)
 
 out = "/data/home/qbao775/translation/tmm_submission/title_page.pdf"
 pdf.output(out)
