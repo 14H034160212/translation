@@ -27,6 +27,15 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
+% Relax float-placement parameters so dense table traffic packs tighter and
+% does not leave large forced-whitespace gaps at the bottom of text pages.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.7}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{4}
+
 % --- CJK support (Chinese source + Japanese translations in qualitative examples) ---
 % REQUIRES the XeLaTeX compiler (Overleaf: Menu -> Compiler -> XeLaTeX).
 % Noto Serif CJK SC covers both Chinese hanzi and Japanese kanji/kana and is
@@ -104,10 +113,10 @@ The contributions of this work are summarized as follows:
 \begin{enumerate}
  \item We propose a complete end-to-end multimodal pipeline for short-drama subtitle processing, spanning recognition, translation, and speech synthesis---to our knowledge the first such comprehensive system for this domain.
  \item We conduct a systematic comparison of eight OCR backbones under controlled conditions, including traditional methods (RapidOCR~\cite{rapidocr2022}, EasyOCR~\cite{easyocr2020}, TrOCR~\cite{li2021trocr}) and recent VLMs (Qwen3-VL~\cite{qwen3vl2025}, Qwen2-VL~\cite{wang2024qwen2}, InternVL2~\cite{chen2024internvl}, GOT-OCR2.0~\cite{wang2024gotocr}, Florence-2~\cite{florence2_2024}), and we provide an ablation study on frame sampling rate.
- \item We introduce a two-parameter confidence-gated fusion strategy ($\theta_p$: ASR log-probability gate; $\theta_s$: OCR similarity gate) and select both parameters via a $10 \times 7$ grid search on a 20-episode validation subset (Table~\ref{tab:param_grid}). The search reveals that the similarity gate $\theta_s$ is the primary design choice, while $\theta_p$ must be relaxed above $-0.8$ to activate any OCR correction. The full fusion system achieves a +10.8\% improvement in composite score over the ASR-only baseline (Table~\ref{tab:fusion}). A threshold sensitivity ablation (Table~\ref{tab:fusion_ablation}) further shows that both degenerate extremes (always replace or never replace) are strictly worse than the selected operating point.
+ \item We introduce a two-parameter confidence-gated fusion strategy ($\theta_p$: ASR log-probability gate; $\theta_s$: OCR similarity gate) and select both parameters via a $10 \times 7$ grid search on a 20-episode validation subset (Supplementary Material). The search reveals that the similarity gate $\theta_s$ is the primary design choice, while $\theta_p$ must be relaxed above $-0.8$ to activate any OCR correction. The full fusion system achieves a +10.8\% improvement in composite score over the ASR-only baseline (Table~\ref{tab:fusion}). A threshold sensitivity ablation (Supplementary Material) further shows that both degenerate extremes (always replace or never replace) are strictly worse than the selected operating point.
  \item We construct a manually annotated Chinese--Japanese parallel subtitle dataset comprising 79 short-drama episodes, and we demonstrate that LoRA fine-tuning improves translation at \emph{every} model scale tested: Qwen3-VL-4B reaches cross-validated BLEU $15.70\pm4.42$ ($+32\%$ relative over same-model zero-shot), Qwen3-8B reaches $19.69\pm2.49$ ($+13\%$), and fine-tuning the strongest baseline Gemma-4-12B reaches $30.75\pm1.84$ ($+17\%$), the best overall, with all metrics computed via a standardised \texttt{strip\_nums}+\texttt{ja-mecab} protocol applied consistently to every model. We further show that visual frames help translation in zero-shot but provide no benefit once domain fine-tuning is applied.
  \item We establish a comprehensive translation baseline covering eleven models spanning zero-shot multimodal VLMs (InternVL3-8B, Qwen3.5-9B, Gemma-4-12B, Qwen3-VL-4B), text-only LLMs (Qwen2.5-7B, Qwen3-8B~\cite{qwen3_2025}, Qwen2.5-3B), and dedicated MT models (M2M-100 1.2B~\cite{fan2021beyond}, SeamlessM4T-v2-large, NLLB-200), showing that domain-specific fine-tuning of a 4B model outperforms nine of eleven baselines on BLEU and chrF++.
- \item We conduct a jieba part-of-speech error analysis showing that the adaptive fusion disproportionately corrects proper nouns (60\% correction rate), and a cross-stage error propagation study quantifying that the fusion-driven CER reduction recovers $+2.2$ BLEU in the simulated analysis, confirmed by a direct end-to-end evaluation (Table~\ref{tab:e2e}) showing fusion recovers $+2.24$ chrF\texttt{++} (61\% of the oracle ceiling) over ASR-only on 16 held-out validation episodes.
+ \item We conduct a jieba part-of-speech error analysis showing that the adaptive fusion disproportionately corrects proper nouns (60\% correction rate), and a cross-stage error propagation study quantifying that the fusion-driven CER reduction recovers $+2.2$ BLEU in the simulated analysis, confirmed by a direct end-to-end evaluation (Supplementary Material) showing fusion recovers $+2.24$ chrF\texttt{++} (61\% of the oracle ceiling) over ASR-only on 16 held-out validation episodes.
  \item We benchmark four neural TTS systems for zero-shot Japanese voice cloning (GPT-SoVITS, CosyVoice2-0.5B, F5-TTS, EdgeTTS) with both automatic metrics and a blind five-rater human listening study (naturalness MOS and speaker-similarity preference), and provide an ablation study on the effect of reference audio duration on speaker similarity.
 \end{enumerate}
 
@@ -164,31 +173,7 @@ All Chinese subtitles were manually annotated by native Chinese-speaking researc
 The inclusion of speaker-ID annotations provides essential context for character-specific dialogue analysis and enables speaker-conditioned voice synthesis in the TTS stage.
 
 \subsection{Dataset Characteristics}
-The dataset comprises 79 paired episodes (130.56 minutes, 3{,}692 subtitle segments, 12 speaker IDs; Table~\ref{tab:dataset}).
-The number of subtitle segments per episode ranges from roughly 30 to 80 (median $\approx$50; Fig.~\ref{fig:subtitle_dist}).
-
-\begin{table}[t]
-\centering
-\caption{Statistical information of the proposed dataset.}
-\label{tab:dataset}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrlr}
-\toprule
-\multicolumn{2}{c}{\textbf{Dataset Composition}} & \multicolumn{2}{c}{\textbf{Subtitle Statistics}} \\
-\cmidrule(lr){1-2} \cmidrule(lr){3-4}
-Video clips (total) & 82 & Total duration (min) & 130.56 \\
-Paired episodes & 79 & Subtitle segments & 3{,}692 \\
-Speaker IDs & 12 & Avg. segments/episode & 46.7 \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.95\columnwidth]{fig_2.png}
-\caption{Distribution of subtitle segments per episode across the 79-episode dataset.}
-\label{fig:subtitle_dist}
-\end{figure}
+The dataset comprises 79 paired episodes (130.56 minutes, 3{,}692 subtitle segments averaging 46.7 per episode, 12 speaker IDs; full statistics and the per-episode distribution are in the Supplementary Material).
 
 The dataset reflects distinctive short-drama traits: high colloquialism (discourse particles, ellipsis, idioms), minimal sentence-final punctuation, short segments ($\sim$8--12 Chinese characters with limited local context), and dense character-specific proper nouns (names, nicknames, honorifics)---making it a challenging, realistic benchmark for end-to-end subtitle processing.
 
@@ -221,7 +206,7 @@ Frame extraction and OCR results are cached to avoid redundant computation acros
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.74\textwidth]{fig_1_v2.png}
+\includegraphics[width=0.56\textwidth]{fig_1_v2.png}
 \caption{Architecture of the proposed end-to-end multimodal system: (1) subtitle recognition via parallel OCR (Qwen3-VL) and ASR (Whisper) with adaptive fusion; (2) translation using a LoRA fine-tuned Qwen3-VL; and (3) speech synthesis via zero-shot voice cloning. Stage~3 is new relative to the conference paper~\cite{an2026icassp}.}
 \label{fig:system}
 \end{figure*}
@@ -244,32 +229,7 @@ Let $\mathcal{A}=\{a_i=(t_i^s,t_i^e,w_i,p_i)\}$ be the Whisper segments (start/e
 \paragraph{Confidence-adaptive fusion}
 Our fusion strategy leverages the complementary strengths of OCR (high precision for on-screen text, but no native temporal grounding) and ASR (fluent temporal segmentation, but phonetic substitution errors on rare proper nouns).
 For each Whisper segment $a_i$ we (i) gather all OCR candidates whose frame timestamp falls within an expanded window $[t_i^s - \delta,\, t_i^e + \delta]$ with $\delta = 1.5$\,s, (ii) gate on the ASR log-probability $p_i$ relative to a confidence threshold $\theta_p$, and (iii) when ASR is uncertain, replace $w_i$ with the most similar OCR candidate provided that the similarity exceeds $\theta_s$.
-The full procedure is given in Algorithm~\ref{alg:fusion}.
-
-\begin{algorithm}[t]
-\caption{Confidence-Adaptive OCR/ASR Fusion}
-\label{alg:fusion}
-\begin{algorithmic}[1]
-\Require Whisper segments $\mathcal{A}$, OCR detections $\mathcal{O}$, time tolerance $\delta$, log-prob threshold $\theta_p$, similarity threshold $\theta_s$
-\Ensure Fused subtitle sequence $\mathcal{S}$
-\State $\mathcal{S} \gets \emptyset$
-\For{each $a_i = (t_i^s, t_i^e, w_i, p_i) \in \mathcal{A}$}
-    \State $\mathcal{C}_i \gets \{\, o_j \in \mathcal{O} \mid \tau_j \in [t_i^s - \delta,\; t_i^e + \delta]\,\}$ \Comment{candidate OCR detections}
-    \If{$p_i \geq \theta_p$} \Comment{ASR is confident; trust Whisper}
-        \State $\hat{w}_i \gets w_i$
-    \Else
-        \State $o^\star \gets \arg\max_{o_j \in \mathcal{C}_i}\, \mathrm{sim}(o_j, w_i)$ \Comment{best OCR match}
-        \If{$\mathcal{C}_i \neq \emptyset$ \textbf{and} $\mathrm{sim}(o^\star, w_i) \geq \theta_s$}
-            \State $\hat{w}_i \gets o^\star$ \Comment{substitute OCR text, retain ASR timing}
-        \Else
-            \State $\hat{w}_i \gets w_i$ \Comment{fallback: keep ASR}
-        \EndIf
-    \EndIf
-    \State $\mathcal{S} \gets \mathcal{S} \cup \{(t_i^s, t_i^e, \hat{w}_i)\}$
-\EndFor
-\State \Return $\mathcal{S}$
-\end{algorithmic}
-\end{algorithm}
+The full procedure is given as pseudocode in the Supplementary Material.
 Both $\theta_p$ and $\theta_s$ are selected by a systematic grid search on a 20-episode validation subset (episodes 3--23, excluding episode 10); the search procedure and results are detailed in Section~\ref{sec:param_selection}, which selects $\theta_p = -0.2$ (nats) and $\theta_s = 80\%$.
 
 
@@ -314,13 +274,8 @@ Each receives the Japanese text and, where applicable, a reference clip; outputs
 \label{sec:experiments}
 
 \subsection{Implementation Details}
-All experiments are conducted on NVIDIA A100 SXM4 80\,GB GPUs running Ubuntu Linux.
-The software environment uses Python~3.10 with PyTorch, the Hugging Face Transformers library, and PEFT for LoRA fine-tuning, with 4-bit weight quantization following QLoRA.
-Video frame extraction is performed using OpenCV at the specified sampling rate.
-For OCR, Qwen3-VL is deployed via a local vLLM inference service, which we found necessary to keep 5\,fps recognition tractable on a single GPU.
-ASR is performed using the Whisper~medium checkpoint~\cite{radford2023robust}.
-Translation metrics are computed using SacreBLEU~\cite{post2018sacrebleu} (BLEU and chrF++) with the standard \texttt{nrefs:1|case:mixed|tok:13a|smooth:exp|version:2.4.0} signature, and COMET via the \texttt{wmt22-comet-da} checkpoint.
-TTS evaluation uses Whisper-medium to transcribe generated audio and \texttt{jiwer} to compute CER (character level, NFKC-normalised, punctuation stripped) and WER (over MeCab-tokenised text) against the Japanese reference.
+All experiments run on NVIDIA A100 80\,GB GPUs with Python~3.10, PyTorch, Hugging Face Transformers, and PEFT for LoRA (4-bit quantization following QLoRA); frames are extracted with OpenCV, OCR is served via a local vLLM instance (needed to keep 5\,fps tractable on one GPU), and ASR uses the Whisper-medium checkpoint~\cite{radford2023robust}.
+Translation metrics use SacreBLEU~\cite{post2018sacrebleu} (signature \texttt{nrefs:1|case:mixed|tok:13a|smooth:exp|version:2.4.0}) and COMET (\texttt{wmt22-comet-da}); TTS evaluation transcribes generated audio with Whisper-medium and computes CER (character-level, NFKC-normalised, punctuation-stripped) and WER (over MeCab-tokenised text) via \texttt{jiwer}.
 
 \subsection{Evaluation Metrics}
 \label{sec:metrics}
@@ -376,24 +331,8 @@ At 1\,fps, the traditional \textbf{RapidOCR}~\cite{rapidocr2022} attains the bes
 \label{sec:fps_ablation}
 
 Short-drama dialogue changes 2--5 times per second, far exceeding 1\,fps coverage.
-On episode \texttt{11.mp4}, detected characters (a recall proxy) rise from 411 at 1\,fps (27.7\% of the 5\,fps total) through 659 at 2\,fps (44.3\%) to 1{,}486 at 5\,fps (Table~\ref{tab:fps_ablation}), and correspondingly Qwen3-VL-4B's corpus CER drops from 0.402 (1\,fps) to 0.086 (5\,fps); we therefore use 5\,fps in production.
+On episode \texttt{11.mp4}, detected characters (a recall proxy) rise from 411 at 1\,fps (27.7\% of the 5\,fps total) through 659 at 2\,fps (44.3\%) to 1{,}486 at 5\,fps (Supplementary Material), and correspondingly Qwen3-VL-4B's corpus CER drops from 0.402 (1\,fps) to 0.086 (5\,fps); we therefore use 5\,fps in production.
 Competing methods are compared at 1\,fps because per-frame accuracy is rate-independent---the gain comes from capturing more frames, not higher per-frame fidelity---so 1\,fps reflects each model's intrinsic accuracy; a uniform 5\,fps VLM comparison, which also requires subtitle-line deduplication, is left to future work.
-
-\begin{table}[t]
-\centering
-\caption{Frame sampling rate ablation for subtitle recall on episode 11.mp4 using Qwen3-VL-4B.}
-\label{tab:fps_ablation}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lcc}
-\toprule
-\textbf{Sampling Rate} & \textbf{Detected Characters} & \textbf{Recall vs.\ 5\,fps} \\
-\midrule
-1\,fps & 411 & 27.7\% \\
-2\,fps & 659 & 44.3\% \\
-5\,fps & 1{,}486 & 100\% (upper bound) \\
-\bottomrule
-\end{tabular}}
-\end{table}
 
 
 
@@ -402,27 +341,9 @@ Competing methods are compared at 1\,fps because per-frame accuracy is rate-inde
 
 
 
-Table~\ref{tab:param_grid} reports the composite scores on the 20-episode validation subset (episodes 3--23, excluding episode 10) for a $10 \times 7$ grid over $\theta_p \in \{-1.5,\,-1.2,\,-1.0,\,-0.8,\,-0.6,\,-0.5,\,-0.4,\,-0.3,\,-0.2,\,0.0\}$ and $\theta_s \in \{30\%,\,40\%,\,50\%,\,60\%,\,70\%,\,80\%,\,90\%\}$ (representative rows and columns shown).
+The Supplementary Material reports the composite scores on the 20-episode validation subset (episodes 3--23, excluding episode 10) for a $10 \times 7$ grid over $\theta_p \in \{-1.5,\,\dots,\,0.0\}$ and $\theta_s \in \{30\%,\,\dots,\,90\%\}$.
 All configurations are evaluated in a consistent segment-joining text format to ensure fair comparison across parameter settings; absolute scores are not directly comparable to the production metrics in Table~\ref{tab:fusion}.
 The search reveals two clear patterns.
-
-\begin{table}[t]
-\centering
-\caption{Grid search composite scores on the 20-episode validation set. Each cell is the corpus-level composite score for the fusion strategy gated by $(\theta_p, \theta_s)$. The upper-left ``flat'' region ($\theta_p \leq -0.8$) corresponds to the ASR-always regime: only 1.6\% of corpus segments have avg\_logprob below $-0.8$, so essentially no OCR substitutions occur. Scores are rounded to three decimal places; the bold marks the unique full-precision maximum ($\theta_p{=}-0.2$, $\theta_s{=}80\%$: 0.8051 vs.\ 0.8046 at $\theta_s{\in}\{40\%,70\%\}$, which also round to 0.805).}
-\label{tab:param_grid}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{c|ccccc}
-\toprule
-$\theta_p$ \textbackslash\ $\theta_s$ & 40\% & 50\% & 60\% & 70\% & 80\% \\
-\midrule
-$\leq -0.8$ & 0.800 & 0.800 & 0.800 & 0.800 & 0.800 \\
-$-0.5$      & 0.802 & 0.801 & 0.800 & 0.800 & 0.800 \\
-$-0.4$      & 0.802 & 0.801 & 0.800 & 0.800 & 0.800 \\
-$-0.3$      & 0.804 & 0.803 & 0.802 & 0.802 & 0.803 \\
-$-0.2$      & 0.805 & 0.803 & 0.803 & 0.805 & \textbf{0.805} \\
-\bottomrule
-\end{tabular}}
-\end{table}
 
 First, $\theta_p$ must be set above $-0.8$ for any improvement over the no-replacement baseline (the flat upper region).
 Analysis of the Whisper log-probability distribution on our corpus shows that avg\_logprob ranges from $-0.96$ to $-0.03$ (median $-0.30$) across 3,907 Whisper-generated segments (which may exceed the 3,692 ground-truth subtitle segments because Whisper also creates segments from non-subtitle speech), with only 1.6\% of segments falling below $-0.8$.
@@ -431,14 +352,14 @@ At $\theta_p = -0.2$, approximately 77.5\% of segments satisfy $p_i < \theta_p$ 
 The broad activation at $\theta_p = -0.2$ means the similarity gate $\theta_s$ becomes the primary filter, which explains the second pattern.
 
 Second, within the active region, $\theta_s$ is the primary design choice: $\theta_s = 80\%$ (stricter matching) prevents false replacements from visually similar but semantically wrong OCR candidates, while $\theta_s \leq 30\%$ (permissive) over-replaces and introduces noise.
-This finding is consistent with the degenerate threshold=0 case in the gating ablation (Table~\ref{tab:fusion_ablation}).
+This finding is consistent with the degenerate threshold=0 case in the gating ablation (Supplementary Material).
 The validation selects $\theta_p = -0.2$, $\theta_s = 80\%$, which we adopt throughout.
 We additionally verify the sensitivity of the time tolerance parameter $\delta$ by evaluating $\delta \in \{0.5, 1.0, 1.5, 2.0\}$\,s with $\theta_p = -0.2$ and $\theta_s = 80\%$ fixed; the CER varies by less than 0.0001 across this range (0.162 in all cases), confirming that $\delta$ has negligible impact and that $\theta_s$ is the sole critical parameter once $\theta_p$ is set.
 
 \subsection{Adaptive Multimodal Fusion}
 \label{sec:fusion_results}
 
-Table~\ref{tab:fusion} presents the results of the adaptive multimodal fusion strategy compared to using either modality in isolation; Table~\ref{tab:fusion_ablation} provides a threshold sensitivity ablation.
+Table~\ref{tab:fusion} presents the results of the adaptive multimodal fusion strategy compared to using either modality in isolation; the Supplementary Material provides a threshold sensitivity ablation.
 We evaluate three configurations in Table~\ref{tab:fusion}: (1) Qwen3-VL OCR only (without ASR timestamp anchors), (2) Whisper ASR only, and (3) our logprob-adaptive fusion.
 
 The OCR-only configuration performs poorly (BLEU 4.44, CER 0.900) because the evaluation framework requires Whisper-format timestamped segments for alignment with the ground truth; without ASR providing temporal anchors, OCR outputs cannot be properly aligned to the reference subtitles.
@@ -467,27 +388,7 @@ Adaptive Fusion (ours) & \textbf{81.68} & \textbf{67.91} & \textbf{0.156} & \tex
 
 
 \textbf{Gating-rule ablation under a unified harness.}
-To enable a like-for-like comparison between static thresholds and the adaptive gate---which the production pipeline does not permit post-hoc owing to its irreversible text-joining step---we re-evaluate every gating configuration inside a single harness: the same fusion implementation and the same corpus-level metrics used for the grid search (Section~\ref{sec:param_selection}), applied to all 79 episodes (Table~\ref{tab:fusion_ablation}).
-
-\begin{table}[t]
-\centering
-\caption{Gating-rule ablation under a \emph{single unified evaluation harness} (identical fusion implementation and corpus-level segment-joined metrics; all 79 episodes). ``Static'' rows open the log-probability gate for every segment ($\theta_p{=}0$); the Adaptive row applies the selected operating point ($\theta_p{=}-0.2$, $\theta_s{=}80$). All rows are directly comparable. Absolute values differ from the production-pipeline fusion metrics in Table~\ref{tab:fusion} due to the corpus-level text-joining format. Best per column in bold.}
-\label{tab:fusion_ablation}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Fusion Strategy} & \textbf{BLEU}$\uparrow$ & \textbf{chrF++}$\uparrow$ & \textbf{CER}$\downarrow$ & \textbf{CharAcc}$\uparrow$ & \textbf{Comp.}$\uparrow$ \\
-\midrule
-Never Replace (ASR only)         & 81.31 & 67.20 & \textbf{0.156} & 0.898 & 0.8066 \\
-Always Replace ($\theta_s{=}0$)  &  0.51 & 14.07 & 0.872 & 0.138 & 0.1030 \\
-Static ($\theta_s{=}40$)         & 81.35 & \textbf{68.32} & 0.161 & \textbf{0.901} & 0.8091 \\
-Static ($\theta_s{=}60$)         & 81.48 & 68.12 & 0.158 & 0.900 & \textbf{0.8094} \\
-Static ($\theta_s{=}80$)         & \textbf{81.61} & 67.77 & \textbf{0.156} & 0.899 & 0.8092 \\
-\midrule
-Adaptive ($\theta_p{=}-0.2$, $\theta_s{=}80$, ours) & 81.60 & 67.73 & \textbf{0.156} & 0.899 & 0.8091 \\
-\bottomrule
-\end{tabular}}
-\end{table}
+To enable a like-for-like comparison between static thresholds and the adaptive gate---which the production pipeline does not permit post-hoc owing to its irreversible text-joining step---we re-evaluate every gating configuration inside a single harness: the same fusion implementation and the same corpus-level metrics used for the grid search (Section~\ref{sec:param_selection}), applied to all 79 episodes (Supplementary Material).
 Three findings emerge.
 First, both degenerate extremes are strictly sub-optimal: ``Always Replace'' collapses catastrophically (BLEU 0.51) because unconditional substitution adopts hallucinated or empty OCR detections whenever any candidate falls in the time window, and ``Never Replace'' (ASR only) forfeits all correction benefits (composite 0.8066 vs.\ 0.8094 for the best gated variant).
 Second, within the gated regime the similarity threshold is the primary driver, with a shallow optimum around $\theta_s \in [40, 80]$ (composite 0.8091--0.8094).
@@ -615,23 +516,7 @@ To quantify the benefit of visual context for translation, we compare two varian
 (1) \textit{Text-only}: the model receives only the OCR-extracted Chinese subtitle text as input, and
 (2) \textit{Multimodal}: the model receives both the subtitle text and representative video frames from the episode.
 
-In the \emph{zero-shot} setting (Table~\ref{tab:ablation_context}), the multimodal variant achieves BLEU 13.44 vs.\ 10.09 for text-only---a $+3.35$ BLEU gain.
-This demonstrates that visual context provides meaningful information when the model is not adapted to the domain, likely by disambiguating character identities, emotional tone, and scene type that is otherwise lost in the subtitle text alone.
-
-\begin{table}[t]
-\centering
-\caption{Translation quality ablation: visual context vs.\ text-only input using Qwen3-VL zero-shot on 20 episodes. Absolute BLEU gain: +3.35.}
-\label{tab:ablation_context}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lcc}
-\toprule
-\textbf{Input Modality} & \textbf{BLEU}$\uparrow$ & \textbf{chrF++}$\uparrow$ \\
-\midrule
-Text-Only (OCR subtitles)       & 10.09 & 28.26 \\
-Multimodal (Video frames + Text) & \textbf{13.44} & \textbf{29.70} \\
-\bottomrule
-\end{tabular}}
-\end{table}
+In the \emph{zero-shot} setting (Supplementary Material), the multimodal variant achieves BLEU 13.44 vs.\ 10.09 for text-only---a $+3.35$ BLEU gain---likely by disambiguating character identities, emotional tone, and scene type that is otherwise lost in the subtitle text alone.
 
 This benefit does \emph{not}, however, carry over to fine-tuning.
 We fine-tuned Qwen3-VL-4B with four video frames per episode supplied during both training and inference, under the identical 5-fold protocol used for the text-only fine-tune (FT+V; per-fold results in Table~\ref{tab:per_fold}).
@@ -667,22 +552,7 @@ Qwen3-8B FT (ours)       & 20.48 & 23.49 & 17.53 & 17.45 & 19.51 & $19.69_{\pm2.
 \label{sec:ablation_tts}
 
 Zero-shot cloning quality depends on the reference clip.
-Comparing F5-TTS under $\sim$3\,s vs.\ $\sim$10\,s references, speaker similarity improves $0.64\to0.71$ (Table~\ref{tab:ablation_tts}); we therefore recommend at least 8--10\,s of clean reference audio per speaker.
-
-\begin{table}[t]
-\centering
-\caption{TTS reference audio duration ablation using F5-TTS. Speaker similarity measured via cosine similarity of speaker embeddings.}
-\label{tab:ablation_tts}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lc}
-\toprule
-\textbf{Reference Duration} & \textbf{Speaker Similarity}$\uparrow$ \\
-\midrule
-Short ($\sim$3\,s) & 0.64 \\
-Long ($\sim$10\,s) & \textbf{0.71} \\
-\bottomrule
-\end{tabular}}
-\end{table}
+Comparing F5-TTS under $\sim$3\,s vs.\ $\sim$10\,s references, speaker similarity improves $0.64\to0.71$ (Supplementary Material); we therefore recommend at least 8--10\,s of clean reference audio per speaker.
 
 
 
@@ -696,119 +566,27 @@ For deployability we profile each stage on one A100 (80\,GB): Whisper-medium RTF
 \label{sec:discussion}
 
 \subsection{Analysis of Recognition Results}
-Frame sampling rate is the dominant recognition factor: 1\,fps captures only 27.7\% of subtitle content, and raising it to 5\,fps cuts Qwen3-VL-4B CER five-fold ($0.402\to0.086$), a trade-off well suited to offline processing.
-The adaptive fusion resolves the complementary failure modes of OCR (weak temporal alignment) and ASR (phonetic proper-noun substitution); its $+10.8\%$ composite gain is concentrated in chrF\texttt{++} ($+10.3$), indicating mostly character-level corrections.
+Frame sampling rate is the dominant recognition factor (1\,fps captures only 27.7\% of subtitle content; 5\,fps cuts CER five-fold), and the adaptive fusion resolves the complementary failure modes of OCR (weak temporal alignment) and ASR (phonetic proper-noun substitution): its $+10.8\%$ composite gain is concentrated in chrF\texttt{++} ($+10.3$), indicating mostly character-level corrections.
 
 \textbf{Fusion error-type analysis.}
-A jieba POS-tagged word-level diff between ASR-only and fused outputs (all 79 episodes; Table~\ref{tab:error_type}) shows that of 227 substitutions, proper nouns (13.2\% of changes) are corrected toward the ground truth at a 60.0\% rate, slightly above common vocabulary (59.1\%)---the fusion makes linguistically targeted corrections of rare entities, e.g.\ \emph{李福}(nr)$\to$\emph{礼服}(n) (a homophonic common noun mis-tagged as a name) and \emph{陆少庆}$\to$\emph{陆少} (a spurious appended character).
-
-\begin{table}[t]
-\centering
-\caption{Word-level error type analysis of adaptive fusion corrections (jieba POS; nr/ns/nt/nz = proper nouns). GT correction rate: fraction of substitutions that moved the output closer to the ground truth.}
-\label{tab:error_type}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Category} & \textbf{Substitutions} & \textbf{\% of Total} & \textbf{GT Corrections} & \textbf{Correction Rate} \\
-\midrule
-Proper nouns (nr/ns/nt/nz) &  30 & 13.2\% & 18 & \textbf{60.0\%} \\
-Numbers                    &   4 &  1.8\% &  3 & 75.0\% \\
-Common vocabulary          & 193 & 85.0\% & 114 & 59.1\% \\
-\midrule
-\textbf{Total}             & \textbf{227} & & & \\
-\bottomrule
-\end{tabular}}
-\end{table}
+A jieba POS-tagged word-level diff between ASR-only and fused outputs (all 79 episodes; Supplementary Material) shows that of 227 substitutions, proper nouns (13.2\% of changes) are corrected toward the ground truth at a 60.0\% rate, slightly above common vocabulary (59.1\%)---the fusion makes linguistically targeted corrections of rare entities, e.g.\ \emph{李福}(nr)$\to$\emph{礼服}(n) (a homophonic common noun mis-tagged as a name) and \emph{陆少庆}$\to$\emph{陆少} (a spurious appended character).
 
 
 
 \subsection{Analysis of Translation Results}
 \label{sec:discussion_translation}
-Fine-tuned Qwen3-VL-4B improves over its zero-shot baseline by $+32\%$ BLEU ($15.70\pm4.42$ vs.\ 11.93), with consistent chrF\texttt{++} (20.78 vs.\ 17.72) and COMET (0.843 vs.\ 0.810) gains; the $\pm4.42$ cross-fold spread reflects genuine domain heterogeneity.
-The fine-tuned model beats its zero-shot counterpart on Folds 0/1/3 but loses on the two highest-OOV folds (Fold~2 and Fold~4 have 36.3\% and 35.7\% word-level OOV vs.\ 33.0--33.1\% elsewhere), where novel character names and slang favour the base model's broader pre-training.
-Scaling LoRA to 8B mitigates this (Fold~2 17.53, Fold~4 19.51 vs.\ 9.58/12.94 at 4B), and the larger zero-shot models show low cross-fold variance ($\pm0.98$ Gemma, $\pm1.00$ Qwen3-8B); augmenting training with multiple series to reduce OOV is a clear future direction.
-The large Qwen2.5-3B gain (ZS 3.58 $\to$ FT 13.10) partly reflects a zero-shot speaker-tag artefact, yet the fine-tuned 3B still exceeds the larger Qwen2.5-7B zero-shot (12.89).
-Visual context adds $+3.35$ BLEU in zero-shot, motivating tighter multimodal integration.
+The $\pm4.42$ cross-fold spread of the fine-tuned 4B reflects genuine domain heterogeneity: it beats its zero-shot counterpart on Folds 0/1/3 but loses on the two highest-OOV folds (Fold~2/4 at 36.3\%/35.7\% word-level OOV vs.\ 33.0--33.1\% elsewhere), where novel names and slang favour the base model's broader pre-training.
+Scaling LoRA to 8B mitigates this (Fold~2 17.53, Fold~4 19.51 vs.\ 9.58/12.94 at 4B), and the larger zero-shot models show low cross-fold variance ($\pm0.98$ Gemma, $\pm1.00$ Qwen3-8B); multi-series training to reduce OOV is a clear future direction.
 
 \textbf{Qualitative analysis.}
-Table~\ref{tab:qual_examples} lists two characteristic error patterns.
-In Example~A, the source phrase \textit{看来我们挺有缘} contains the culturally loaded term 缘 (a predestined fate or karmic connection between people).
-The fine-tuned model correctly maps it to the Japanese 縁 (\textit{en})---preserving both meaning and cultural nuance---whereas the zero-shot baseline substitutes 運 (\textit{un}, ``luck''), losing the relational concept.
-In Example~B, from Fold~2 (word OOV rate 36.3\%), the source 拜托 (``come on'' / ``please'') triggers a domain-specific hallucination in the fine-tuned model: it generates a sentence about the drama character ``White''---a fashion designer encountered in the training episodes---despite the source being a short exclamation.
-This is a direct symptom of the OOV-driven generalisation failure discussed above: the model over-fits to co-occurring characters in training episodes and mis-fires on validation episodes with different character distributions.
-
-\begin{table}[t]
-\centering
-\caption{Qualitative translation examples. Example A shows a culturally nuanced term translated correctly by FT but incorrectly by ZS. Example B shows an OOV-driven hallucination by FT that ZS avoids.}
-\label{tab:qual_examples}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{llp{4cm}p{4cm}p{4cm}}
-\toprule
-\textbf{Ex.} & \textbf{Chinese source} & \textbf{FT (ours)} & \textbf{ZS (Qwen3-VL-4B)} & \textbf{Reference} \\
-\midrule
-A & 看来我们挺有缘 & \textbf{きっと縁があるな} \newline (cultural term preserved) & きっと運が良いのだろう \newline (semantic error: 縁→運) & やっぱり縁があるのかもね \\
-\midrule
-B & 拜托 & お前はお母さんも有名なファッションデザイナーのWhiteさんだろ \newline (OOV hallucination) & お祈り & っていうか \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-Across baselines (Table~\ref{tab:translation}), \textbf{Gemma-4-12B} leads in both regimes (zero-shot 26.27 BLEU / 0.8917 COMET; fine-tuned 30.75 / chrF\texttt{++} 30.63, best overall).
-Our fine-tuned 4B (15.70, COMET 0.843) trails it but uses one-third the parameters under stricter cross-validation, while \textbf{Qwen3-8B} zero-shot (17.46, 0.864) edges it on BLEU at twice the size.
-InternVL3-8B (13.65) underperforms at comparable scale, and Qwen3.5-9B (3.49) collapses because chain-of-thought exhausts the token budget before emitting Japanese; M2M-100 (6.33) and SeamlessM4T-v2 (5.67) confirm dedicated MT transfers poorly to colloquial speaker-tagged subtitles.
-Overall the 4B fine-tune beats 9 of 11 zero-shot baselines, trailing only the larger Gemma-4-12B and Qwen3-8B.
+Two characteristic patterns recur (examples in the Supplementary Material): the fine-tuned model preserves culturally loaded terms the zero-shot baseline mistranslates (e.g.\ 缘$\to$縁 \emph{en} rather than 運 \emph{un}, ``luck''), but on the highest-OOV folds it can hallucinate training-episode entities (e.g.\ inventing a named character for a short exclamation), a direct symptom of the OOV-driven over-fitting discussed above.
 
 \textbf{Statistical significance.}
 Paired $t$-tests over the five folds confirm the Gemma-4-12B-ZS gap is significant ($t=-4.40$, $p=0.012$) while the Qwen3-8B-ZS gap is not ($t=-0.83$, $p=0.453$); Wilcoxon tests ($p=0.063$, $0.813$) and fold-level bootstrap CIs agree.
 
 \textbf{Cross-stage error propagation.}
-Recognition errors in stage~1 propagate to translation.
-Simulating recognition noise (random character substitution in the oracle source, then translating with the fold-0 LoRA model) gives an approximately linear CER--BLEU relation (Fig.~\ref{fig:error_prop}): at the ASR-only point (CER 0.249) translation BLEU falls to 3.5 vs.\ 13.1 for clean source, while the adaptive fusion (CER 0.156) recovers $\approx\textbf{+2.2}$ BLEU.
-A direct end-to-end evaluation on the 16 fold-0 episodes (document level; Table~\ref{tab:e2e}) confirms this: fusion reaches chrF\texttt{++} 13.56 vs.\ 11.32 for ASR-only, recovering \textbf{$+2.24$} points (61\% of the oracle ceiling 14.97).
+Stage-1 recognition errors propagate to translation: simulating recognition noise gives an approximately linear CER--BLEU relation (Supplementary Material), and a direct end-to-end evaluation on the 16 fold-0 episodes (document level; Supplementary Material) confirms fusion recovers $+2.24$ chrF\texttt{++} over ASR-only (13.56 vs.\ 11.32; 61\% of the oracle ceiling 14.97).
 Document-level BLEU for ASR-only is 0.00 because propagated proper-noun errors eliminate all episode-level 4-gram overlap---a genuine linguistic effect, hence chrF\texttt{++} is the primary metric here.
-
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-  xlabel={Recognition CER},
-  ylabel={Translation BLEU},
-  width=0.9\columnwidth, height=5cm,
-  xmin=0, xmax=0.55,
-  ymin=0, ymax=15,
-  grid=major,
-  legend pos=north east,
-  legend style={font=\small},
-  mark size=2pt,
-]
-\addplot[blue, mark=*, thick] coordinates {
-  (0.000,13.10)(0.050,9.84)(0.100,7.43)
-  (0.156,5.71)(0.200,4.67)(0.249,3.50)
-  (0.350,2.08)(0.500,0.97)
-};
-\addplot[red, dashed, thick] coordinates {(0.156,0)(0.156,5.71)};
-\addplot[orange, dashed, thick] coordinates {(0.249,0)(0.249,3.50)};
-\legend{BLEU vs.\ CER, Fusion (CER=0.156), ASR-only (CER=0.249)}
-\end{axis}
-\end{tikzpicture}
-\caption{Cross-stage error propagation: translation BLEU as a function of recognition CER. Dashed lines mark the operating points of ASR-only (CER=0.249) and Adaptive Fusion (CER=0.156). The fusion's recognition improvement yields +2.2 BLEU in the translation stage.}
-\label{fig:error_prop}
-\end{figure}
-
-\begin{table}[t]
-\caption{End-to-end pipeline evaluation on 16 fold-0 validation episodes. Source text fed to the Qwen3-VL-4B LoRA translation model varies by condition; metrics are computed at the document level (entire episode as one unit) against the Japanese ground truth. chrF\texttt{++} is the primary metric (character-level, more robust than BLEU for Japanese at document granularity). The ASR-only BLEU of 0.00 is a genuine consequence of propagated proper-noun errors eliminating all document-level 4-gram matches, not an evaluation artefact (see text).}
-\label{tab:e2e}
-\centering
-\begin{tabular}{lcc}
-\toprule
-\textbf{Source Condition} & \textbf{BLEU}$\uparrow$ & \textbf{chrF\texttt{++}}$\uparrow$ \\
-\midrule
-Oracle (gold Chinese text)   & 5.02 & 14.97 \\
-Adaptive Fusion (ours)       & 0.48 & 13.56 \\
-ASR-only (Whisper-medium)    & 0.00 & 11.32 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 
 
@@ -832,7 +610,7 @@ Third, the pipeline operates offline; real-time processing would require further
 This paper presents a comprehensive end-to-end multimodal system for subtitle recognition and Chinese--Japanese translation in short dramas.
 Our system integrates multiple state-of-the-art components: Qwen3-VL for frame-level OCR, Whisper for timestamp-anchored ASR, an adaptive confidence-based fusion strategy, LoRA fine-tuned Qwen3-VL for context-aware translation, and neural TTS for Japanese speech synthesis.
 
-Our key findings: 5\,fps sampling is essential for OCR recall (CER $0.402\to0.086$); the confidence-gated fusion improves the composite recognition score by $+10.8\%$ over ASR-only while matching a well-tuned static threshold and skipping confident segments; domain LoRA fine-tuning helps at every scale (BLEU 15.70 at 4B, 19.69 at 8B, 30.75 at 12B), with visual context helping zero-shot but not fine-tuning; and GPT-SoVITS is the only TTS system combining commercial-grade naturalness (MOS 3.08, tied with EdgeTTS) with effective cloning (45\% of human similarity votes). The fusion's recognition gains propagate downstream to $+2.24$ chrF\texttt{++}.
+Our key findings: 5\,fps sampling is essential for OCR recall; the confidence-gated fusion improves the composite recognition score by $+10.8\%$ over ASR-only while matching a well-tuned static threshold, and propagates downstream to $+2.24$ chrF\texttt{++}; domain LoRA fine-tuning helps at every scale (BLEU 15.70 at 4B, 19.69 at 8B, 30.75 at 12B), with visual context helping zero-shot but not fine-tuning; and GPT-SoVITS uniquely combines commercial-grade naturalness (MOS 3.08, tied with EdgeTTS) with effective cloning (45\% of similarity votes).
 Future work will extend the corpus to multiple series and genres, explore learned multimodal fusion and confidence estimators, and optimise the pipeline for low-latency deployment.
 
 %%
