@@ -2,11 +2,11 @@
 
 **To:** Editor-in-Chief, IEEE Transactions on Multimedia (TMM)
 
-**From:** Jing An (joint first author and corresponding author), on behalf of all co-authors
+**From:** Jing An (corresponding author), on behalf of all co-authors
 
 Jing An — School of AI and Language Sciences, Beijing International Studies University, Beijing 100024, China — jing.an@bisu.edu.cn
 
-**Authorship:** Qiming Bao and Jing An are joint first authors (equal contribution; Qiming Bao listed first); Jing An is the corresponding author.
+**Authorship:** Qiming Bao is the first author; Jing An is the corresponding author.
 
 **Date:** [INSERT SUBMISSION DATE]
 
@@ -70,4 +70,4 @@ School of AI and Language Sciences, Beijing International Studies University
 
 jing.an@bisu.edu.cn
 
-on behalf of all co-authors: Qiming Bao (joint first author), Jing An (joint first author), Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu, and Michael Witbrock
+on behalf of all co-authors: Qiming Bao (first author), Jing An (corresponding author), Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu, and Michael Witbrock

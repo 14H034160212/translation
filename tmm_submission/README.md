@@ -41,7 +41,7 @@ Top of [main.tex](main.tex) documents alternative `\documentclass` lines:
 ## What changed vs. the TOMM version
 
 - Class swapped from `acmart` to `IEEEtran` (journal mode, two-column).
-- Author block uses IEEE `\thanks{}` notes for affiliations and equal-contribution / corresponding-author marks.
+- Author block uses IEEE `\thanks{}` notes for affiliations and the corresponding-author mark.
 - TMM runs **single-blind** review, so author names and the self-citation are no longer anonymised. The cover letter, description of differences, and title page have been rewritten to match TMM/IEEE policy and the manuscript ID is left blank for ScholarOne to assign.
 - Removed ACM-specific blocks: `\setcopyright`, `\acm{Journal,Volume,DOI,...}`, `CCSXML`, `\ccsdesc`, `\received`, `\Description{}`, `\begin{acks}`.
 - `\keywords{}` → `\begin{IEEEkeywords}...\end{IEEEkeywords}`.

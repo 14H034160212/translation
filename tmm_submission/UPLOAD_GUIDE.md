@@ -102,7 +102,7 @@ python3 build_cover_letter.py
 |---|---|
 | 1 | Type=Regular Paper;Title 与 Running Head 复制 [main.tex](main.tex);Abstract 复制 abstract block(去掉 LaTeX 命令) |
 | 2 | Keywords 9 个(从 `\begin{IEEEkeywords}` 直接搬);如系统要求 EDICS 选 1-2 个最贴近的(Multimedia Processing / Video Analysis 类) |
-| 3 | 8 位作者按以下顺序录入,**只勾 Jing An 一人为 Corresponding Author**:`Qiming Bao, Jing An, Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu, Michael Witbrock`(Qiming Bao 与 Jing An 为共同第一作者,Qiming Bao 列首) |
+| 3 | 8 位作者按以下顺序录入,**只勾 Jing An 一人为 Corresponding Author**:`Qiming Bao, Jing An, Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu, Michael Witbrock`(Qiming Bao 为唯一第一作者,Jing An 为通讯作者,作者顺序不变) |
 | 4 | Preferred / Non-Preferred Reviewers 留空(除非有 COI) |
 | 5 | Cover letter 内容粘贴进文本框 *或* Step 6 上传 `cover_letter.pdf`;填 **Conference Disclosure**(声明 ICASSP 2026 prior version,引用 `original_presentation_icassp2026.pdf` 与 `description_of_differences.pdf`)/ COI / Data Availability |
 | 6 | 按本文档"文件清单"顺序上传文件,**逐个核对 file type** |
