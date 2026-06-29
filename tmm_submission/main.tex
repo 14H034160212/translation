@@ -606,8 +606,7 @@ Third, the pipeline operates offline; real-time processing would require further
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper presents a comprehensive end-to-end multimodal system for subtitle recognition and Chinese--Japanese translation in short dramas.
-Our system integrates multiple state-of-the-art components: Qwen3-VL for frame-level OCR, Whisper for timestamp-anchored ASR, an adaptive confidence-based fusion strategy, LoRA fine-tuned Qwen3-VL for context-aware translation, and neural TTS for Japanese speech synthesis.
+This paper presents a comprehensive end-to-end multimodal system for short-drama subtitle recognition and Chinese--Japanese translation, integrating Qwen3-VL frame-level OCR, Whisper timestamp-anchored ASR, confidence-adaptive fusion, LoRA fine-tuned Qwen3-VL translation, and zero-shot neural TTS for Japanese dubbing.
 
 Our key findings: 5\,fps sampling is essential for OCR recall; the confidence-gated fusion improves the composite recognition score by $+10.8\%$ over ASR-only while matching a well-tuned static threshold, and propagates downstream to $+2.24$ chrF\texttt{++}; domain LoRA fine-tuning helps at every scale (BLEU 15.70 at 4B, 19.69 at 8B, 30.75 at 12B), with visual context helping zero-shot but not fine-tuning; and GPT-SoVITS uniquely combines commercial-grade naturalness (MOS 3.08, tied with EdgeTTS) with effective cloning (45\% of similarity votes).
 Future work will extend the corpus to multiple series and genres, explore learned multimodal fusion and confidence estimators, and optimise the pipeline for low-latency deployment.
@@ -630,6 +629,7 @@ The dataset was collected from a single commercial series with the rights holder
 \section*{Acknowledgment}
 This work was supported by the Postdoctoral Fellowship Program for Overseas Talent Introduction, Ministry of Education of China.
 The authors thank the commercial entertainment company that provided the short-drama dataset for research purposes, and the native Japanese researchers who contributed subtitle translations.
+The authors declare no competing financial or non-financial interests related to this work.
 
 %%
 %% Bibliography
