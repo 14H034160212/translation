@@ -29,9 +29,18 @@ This manuscript is a substantial extension of our preliminary conference paper a
 1. **Comprehensive recognition benchmark**: eight OCR backbones evaluated under matched conditions (Qwen3-VL, Qwen2-VL, InternVL2, GOT-OCR2.0, Florence-2, RapidOCR, EasyOCR, TrOCR) versus the single Qwen2-VL configuration in the conference version.
 2. **Frame-rate ablation**: a new study quantifying the 1 fps → 5 fps recall gap from 27.7% → 100%, absent from the conference paper.
 3. **Upgraded fusion algorithm** (Algorithm 1): replaces the conference paper's fixed similarity threshold with a two-parameter confidence-adaptive gate using Whisper's segment log-probabilities, selected by grid search and formalized as new pseudocode.
-4. **Cross-validated translation benchmark and fine-tuning scaling study**: LoRA fine-tuned **Qwen3-VL-4B** achieves 5-fold cross-validated **BLEU 15.70±4.42 / chrF++ 20.78±2.81 / COMET 0.843**, a +32% relative gain over its own zero-shot baseline (vs. BLEU 9.84 in the conference paper). We benchmark **eleven** baselines (incl. M2M-100, SeamlessM4T-v2, NLLB-200, InternVL3-8B, Qwen3.5-9B, Gemma-4-12B, Qwen3-8B) and fine-tune at multiple scales, with Gemma-4-12B reaching BLEU 30.75±1.84, showing domain fine-tuning helps across the 4B–12B range.
+4. **Cross-validated translation benchmark and fine-tuning scaling study**: LoRA fine-tuned **Qwen3-VL-4B** achieves 5-fold cross-validated **BLEU 15.70±4.42 / chrF++ 20.78±2.81 / COMET 0.843**, a +25% relative gain over its own per-fold zero-shot mean (and far above the BLEU 9.84 of the conference model). We benchmark **eleven** baselines (incl. M2M-100, SeamlessM4T-v2, NLLB-200, InternVL3-8B, Qwen3.5-9B, Gemma-4-12B, Qwen3-8B) and fine-tune at multiple scales, with Gemma-4-12B reaching BLEU 30.75±1.84, showing domain fine-tuning helps across the 4B–12B range.
 5. **Complete speech-synthesis stage**: four zero-shot TTS systems (GPT-SoVITS, CosyVoice2-0.5B, F5-TTS, EdgeTTS) compared with both automatic metrics and a **blind five-rater human listening study**, plus a reference-duration ablation; **entirely new** relative to the conference paper.
 6. **New analyses**: visual-context translation ablation (+3.35 BLEU zero-shot; no benefit under fine-tuning), cross-stage error-propagation analysis, computational cost / real-time-factor profiling, and a 100-segment qualitative error taxonomy.
+
+## Authorship and changes since the conference version
+
+The author list of this journal extension differs from the ICASSP 2026 conference paper, reflecting the substantial new contributions described above. We note this change explicitly for transparency:
+
+- **Qiming Bao** (first author; not on the conference paper) led the journal extension — designing and conducting the entirely new speech-synthesis stage together with its blind five-rater human listening study, the cross-validated eleven-baseline translation benchmark and multi-scale (4B/8B/12B) fine-tuning study, the cross-stage error-propagation analysis, and the preparation of this manuscript.
+- **Michael Witbrock** (last author; not on the conference paper) provided senior academic supervision and guidance on the methodology, analysis, and presentation of the extended study.
+- The remaining co-authors (Jing An, Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu) contributed to the original conference system and to its extension here.
+- The author order reflects these relative contributions. All authors have read and approved the manuscript and agreed on the author order and on the corresponding author (Jing An).
 
 ## Originality and ethical compliance
 
