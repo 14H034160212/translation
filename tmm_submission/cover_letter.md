@@ -8,7 +8,7 @@ Jing An — School of AI and Language Sciences, Beijing International Studies Un
 
 **Authorship:** Qiming Bao is the first author; Jing An is the corresponding author.
 
-**Date:** [INSERT SUBMISSION DATE]
+**Date:** June 29, 2026
 
 **Manuscript title:** *An End-to-End Multimodal System for Subtitle Recognition and Chinese–Japanese Translation with Speech Synthesis in Short Dramas*
 
@@ -53,10 +53,6 @@ The author list of this journal extension differs from the ICASSP 2026 conferenc
 ## Suggested reviewers (optional)
 
 We do not propose specific reviewers, but we suggest the editorial board consider experts in any of the following overlapping areas: (i) video subtitling and multimedia localization, (ii) multimodal fusion for speech and video understanding, (iii) low-resource and domain-adapted neural machine translation for video content, and (iv) zero-shot voice cloning and TTS evaluation for video dubbing.
-
-## Reviewer-excluded list
-
-We respectfully request that the following individuals not be invited as reviewers due to recent collaboration: *[INSERT NAMES IF ANY; LEAVE EMPTY OTHERWISE]*.
 
 ## Compliance with TMM submission requirements
 
