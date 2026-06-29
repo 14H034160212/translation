@@ -57,6 +57,7 @@ We do not propose specific reviewers, but we suggest the editorial board conside
 ## Compliance with TMM submission requirements
 
 - **Format:** IEEE `IEEEtran` class, `journal` option (two-column, single-blind).
+- **Compilation (note to editorial staff):** the manuscript uses the `xeCJK` package to render a few Chinese/Japanese characters in the qualitative examples and **must be compiled with XeLaTeX, not pdfLaTeX** (pdfLaTeX fails on these characters). The first line of `main.tex` carries `% !TEX program = xelatex`, and a `README_COMPILE.txt` is included in the manuscript archive.
 - **References:** IEEE Reference Format (`IEEEtran.bst`).
 - **Keywords:** IEEE keywords block on the first page.
 - **Summary of differences:** uploaded as a separate document for the journal extension of our ICASSP 2026 paper, per IEEE Policy on Prior Publication.
