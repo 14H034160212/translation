@@ -55,11 +55,13 @@ for line in affils:
 pdf.ln(8)
 
 # --- Manuscript info ---
+# REMINDER: ScholarOne assigns the Manuscript ID (TMM-XXXXX) on submission.
+# Replace the bracketed text below with that ID after submitting.
 pdf.set_font("Helvetica", "B", 11)
 pdf.cell(0, 6, "Manuscript Information", ln=1)
 pdf.set_font("Helvetica", "", 10)
 pdf.cell(40, 5, "Manuscript ID:", ln=0)
-pdf.cell(0, 5, "[to be assigned by ScholarOne]", ln=1)
+pdf.cell(0, 5, "[to be assigned by ScholarOne - fill in after submission]", ln=1)
 pdf.cell(40, 5, "Journal:", ln=0)
 pdf.cell(0, 5,
          "IEEE Transactions on Multimedia (TMM)",
