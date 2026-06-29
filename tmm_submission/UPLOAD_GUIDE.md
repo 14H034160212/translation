@@ -1,46 +1,55 @@
 # IEEE TMM 投稿包
 
 **Manuscript:** *An End-to-End Multimodal System for Subtitle Recognition and Chinese–Japanese Translation with Speech Synthesis in Short Dramas*
-**Submission system:** ScholarOne Manuscripts — <https://mc.manuscriptcentral.com/tcsvt>
-**Generated:** 2026-05-09 (TMM version, ported from `tomm_submission/`)
+**Submission system:** ScholarOne Manuscripts — <https://mc.manuscriptcentral.com/tmm-ieee>
+**作者:** Qiming Bao（唯一第一作者）, Jing An（**通讯作者**）, Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu, Michael Witbrock
 
-> ⚠️ TMM 评审默认是 **single-blind**(reviewer 看不到作者,但作者署名在投稿稿件上)。本投稿包不再像 TOMM 版本那样做匿名化:`main.tex` 顶部已经写入完整作者名、单位与邮箱(IEEEtran `\thanks{}` 块),自引也以正常作者格式呈现。投稿前请按下方"main.pdf 合规清单"再核对一遍。
+> ⚠️ **编译引擎必须用 XeLaTeX**（正文与补充材料含中日文 `xeCJK`，pdfLaTeX 会报错）。Overleaf: Menu → Compiler → XeLaTeX。
+> ⚠️ TMM 评审是 **single-blind**（reviewer 看不到审稿意见，但作者署名公开在稿件上）。`main.tex` 已写入完整作者名/单位/邮箱（IEEEtran `\thanks{}`），自引以正常署名呈现。
+> ⚠️ 正文本地实测 **10 页**（含参考文献，符合 TMM 初投上限）；作者简介用 `\iffalse` 关闭（不计页数，camera-ready 再开）。
 
 ---
 
-## 文件清单（按上传顺序）
+## ScholarOne "Upload Manuscript" 槽位映射
 
-| 顺序 | 文件 | 大小 (字节) | ScholarOne File Type | 谁能看到 |
-|---|---|---|---|---|
-| 1 | `main.pdf` *(由 `main.tex` 编译产生)* | TBD | **Main Document** | Editor + Reviewers |
-| 2 | `main.tex` | 60 KB | LaTeX Source | Editor + Reviewers |
-| 3 | `refs.bib` | 15 KB | LaTeX Source | Editor + Reviewers |
-| 4 | `fig_1_v2.png` | 445 KB | Figure | Editor + Reviewers |
-| 5 | `fig_2.png` | 48 KB | Figure | Editor + Reviewers |
-| 6 | `original_presentation_icassp2026.pdf` | 2.2 MB | **Prior Conference Paper** | Editor (often visible to Reviewers) |
-| 7 | `description_of_differences.pdf` | 7 KB | **Summary of Differences** | Editor + Reviewers |
-| 8 | `supplementary.zip` | 18 KB | **Supplementary Material** | Editor + Reviewers |
-| 9 | `cover_letter.pdf` | 7 KB | **Cover Letter** | **Editor only** |
-| 10 | `title_page.pdf` *(可选, 见说明)* | 2 KB | Title Page | Editor only |
+ScholarOne 的 Upload 页面分 **Required Files** 和 **Optional Files** 两块，按槽位上传对应文件：
 
-> ⚠️ Cover letter 上传时务必把 file type 设为 "Cover Letter",否则会进 reviewer 包。
-> ⚠️ ScholarOne 上 IEEE 用的 file-type 选项随会随期刊微调,按现场标签选最贴近的,如 "Manuscript File" / "Bibliography" / "Image" 等。
-> ⚠️ 本目录下的 `main.pdf` **本地未生成**(机器无 LaTeX),请用 Overleaf 或本地 TeX Live 编译 `main.tex` 后再上传第 1 项。
+### 🔴 Required Files（必填）
 
-**Total**: 10 files, 约 2.8 MB,远低于 ScholarOne 单文件 30 MB / 总计 100 MB 上限。
+| ScholarOne 槽位 | 上传文件 | 说明 |
+|---|---|---|
+| **Main Manuscript** | `main_manuscript.zip` | LaTeX 打包（根目录含 `main.tex` + `refs.bib` + `fig_1_v2.png`）。**不含**任何补充材料。系统会自动编译出审稿 PDF |
+| **Conflict of Interest** | 勾选 ☑ "None of the authors have a conflict of interest to disclose"；如系统坚持要文件则传 `conflict_of_interest.pdf` | 正文 Acknowledgment 已含 COI 声明 |
+
+### ⚪ Optional Files（按适用上传）
+
+| ScholarOne 槽位 | 上传文件 | 说明 |
+|---|---|---|
+| **Supplementary Material for Review** | `supplementary_material.pdf` + `supplementary.zip` | 表格/图/算法的补充 PDF（**用 Overleaf XeLaTeX 重编 `supplementary_material.tex` 获得 Noto 字体版**）+ 数据/音频样本压缩包 |
+| **Previously Published – Statement** | `description_of_differences.pdf` | Summary of Differences（vs ICASSP 2026）|
+| **Previously Published – Files** | `icassp2026_paper.pdf` | ICASSP 2026 会议论文（可再附 `original_presentation_icassp2026.pdf` 幻灯片）|
+| **Cover letter / Comments** | `cover_letter.pdf` | **仅 Editor 可见**，含作者变更说明 |
+| **LaTeX Supplementary File** | `supplementary_latex.zip` | 补充材料源文件（`supplementary_material.tex` + `fig_2.png`）|
+| **Image**（可选）| `fig_1_v2.png` | 已嵌在 Main Manuscript 内，可不重复上传 |
+
+**可跳过的槽位**（初投不适用）：Main Document – Tracked Changes（修回才需要）、Additional File for Review but Not for Publication、Supplementary Material Not for Review、Supporting Document（被拒后回复审稿人才需要）。
+
+> ⚠️ Cover letter 槽位（"Cover letter / Comments"）不对 reviewer 显示——作者变更说明等放这里。
+> ⚠️ Main Manuscript 上传后**务必下载它生成的 review proof PDF**，确认中日文示例（缘→縁 等）正常显示、无编译报错；若 ScholarOne 默认 pdfLaTeX 导致 CJK 报错，联系我出 pdfLaTeX 兼容版。
 
 ---
 
 ## main.pdf 合规清单(submit 前要逐项核对)
 
-- [ ] `\documentclass[journal]{IEEEtran}` (或 review-stage `[journal,onecolumn,11pt,draftcls]{IEEEtran}`)
-- [ ] 题首作者块、`\thanks{}` 单位/邮箱、共一/通讯标注完整
+- [ ] **用 XeLaTeX 编译**(含 `xeCJK`，pdfLaTeX 会失败);中日文示例正常显示
+- [ ] `\documentclass[journal]{IEEEtran}`
+- [ ] 题首作者块、`\thanks{}` 单位/邮箱完整;**Qiming Bao 唯一第一作者、Jing An 通讯作者**(无共一标注)
 - [ ] Abstract、IEEEkeywords 显示正常
-- [ ] 系统架构图 (`fig_1_v2.png`) 用 `figure*` 跨双栏
-- [ ] 参考文献由 `IEEEtran.bst` 编译
-- [ ] 自引 `an2026icassp` 以**正常作者署名**出现(TMM 是 single-blind,不需要 anonymize)
-- [ ] PDF 元数据中作者名段与 `main.tex` 一致
-- [ ] 所有图都有 caption,公式编号连贯,Algorithm 1 显示正常
+- [ ] 系统架构图 (`fig_1_v2.png`) 用 `figure*` 跨双栏(宽度 `0.56\textwidth`)
+- [ ] 参考文献由 `IEEEtran.bst` 编译;正文 **10 页**(含参考文献)
+- [ ] 0 overfull box;自引 `an2026icassp` 以**正常作者署名**出现(single-blind,不 anonymize)
+- [ ] 所有图表有 caption,公式编号连贯;**Algorithm 1 在补充材料**(supplementary)
+- [ ] COI 声明在 Acknowledgment;Reproducibility / Data Availability / Ethics 三段在文末
 
 ---
 
@@ -59,24 +68,27 @@ README.md             — full index + reproduction recipe
 
 ---
 
-## ⚠️ 投稿前还需要你做的 3 件事
+## ⚠️ 投稿前还需要你做的事
 
-### 1. 编译 main.pdf
+### 1. 用 XeLaTeX 编译 main.pdf 和 supplementary_material.pdf
 
-在 Overleaf 或本地 TeX Live 上把 [main.tex](main.tex) 编译出 `main.pdf`,放回本目录。命令行:
+在 Overleaf(Compiler 选 **XeLaTeX**)或本地 TeX Live 编译。命令行:
 
 ```bash
-pdflatex main && bibtex main && pdflatex main && pdflatex main
+xelatex main && bibtex main && xelatex main && xelatex main
+xelatex supplementary_material   # 补充材料同样用 XeLaTeX,得到 Noto 字体版
 ```
+
+> Main Manuscript 槽位本身上传的是 `main_manuscript.zip`(源文件,系统自编译);上面手动编译是为了**自己先核对 PDF 没问题**、以及拿到 Noto 字体版的 `supplementary_material.pdf`。
 
 ### 2. Cover letter 占位符替换
 
-[cover_letter.md](cover_letter.md) 现有两处占位符,修改后再重新生成 PDF:
-- 第 13 行 `[INSERT SUBMISSION DATE]` → 实际投稿日期(例如 `May 15, 2026`)
-- 第 49 行 `[INSERT NAMES IF ANY; LEAVE EMPTY OTHERWISE]` → 实际名单,**没有就把整段 Reviewer-excluded list 删掉**
+[cover_letter.md](cover_letter.md) 现有两处占位符,修改后重新生成 PDF:
+- `[INSERT SUBMISSION DATE]` → 实际投稿日期
+- `[INSERT NAMES IF ANY; LEAVE EMPTY OTHERWISE]` → Reviewer-excluded 名单,**没有就删掉整段**
 
 ```bash
-cd /data/home/qbao775/translation/tcsvt_submission
+cd /data/home/qbao775/translation/tmm_submission
 python3 build_cover_letter.py
 ```
 
@@ -104,9 +116,9 @@ python3 build_cover_letter.py
 | 2 | Keywords 9 个(从 `\begin{IEEEkeywords}` 直接搬);如系统要求 EDICS 选 1-2 个最贴近的(Multimedia Processing / Video Analysis 类) |
 | 3 | 8 位作者按以下顺序录入,**只勾 Jing An 一人为 Corresponding Author**:`Qiming Bao, Jing An, Rui-Yang Ju, Haofei Chang, Jinhua Su, Yanbing Bai, Xin Qu, Michael Witbrock`(Qiming Bao 为唯一第一作者,Jing An 为通讯作者,作者顺序不变) |
 | 4 | Preferred / Non-Preferred Reviewers 留空(除非有 COI) |
-| 5 | Cover letter 内容粘贴进文本框 *或* Step 6 上传 `cover_letter.pdf`;填 **Conference Disclosure**(声明 ICASSP 2026 prior version,引用 `original_presentation_icassp2026.pdf` 与 `description_of_differences.pdf`)/ COI / Data Availability |
-| 6 | 按本文档"文件清单"顺序上传文件,**逐个核对 file type** |
-| 7 | 下载 review proof PDF 逐页核查 → 勾选合规声明 → Submit |
+| 5 | 上传 `cover_letter.pdf`(Cover letter / Comments 槽位);填 **Conference Disclosure**(声明 ICASSP 2026 prior version,对应 `icassp2026_paper.pdf` 与 `description_of_differences.pdf`)/ COI(勾"无")/ Data Availability。**注意作者变更已在 cover letter 中说明**(Qiming Bao 为新增第一作者) |
+| 6 | 按上方"ScholarOne 槽位映射"逐个槽位上传文件,**核对每个文件进对槽位** |
+| 7 | 下载 review proof PDF 逐页核查(**中日文示例是否正常**) → 勾选合规声明 → Submit |
 
 ---
 
