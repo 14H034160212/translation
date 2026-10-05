@@ -10,6 +10,8 @@
 - `refs.bib` — bibliography (same references; MDPI compiles it with `mdpi.bst`).
 - `fig_1_v2.png` — Figure 1 (system architecture).
 - `fig_2.png` — used by the Supplementary Materials (per-episode subtitle distribution).
+- `supplementary.tex` — Supplementary Materials (Algorithm S1, Tables S1--S9, Figures S1--S2), **standalone** (compiles on its own with XeLaTeX).
+- `supplementary.pdf` — local preview (compiled with a fallback CJK font; re-compile on Overleaf with Noto for the final version).
 - `cover_letter.md` — cover letter for *Mathematics* (fill in the date).
 
 ## How to compile (IMPORTANT)
@@ -31,8 +33,8 @@ without that template.
       the ICASSP/TMM versions) agree to this author list and order.
 - [ ] Verify ORCID iDs for all three authors in the MDPI submission form.
 - [ ] Fill the submission date in `cover_letter.md`.
-- [ ] Build the Supplementary Materials PDF (the tables/figures moved out of the main
-      paper) from the TMM `supplementary_material.tex`, or re-create in MDPI style.
+- [x] Supplementary Materials prepared (`supplementary.tex`; preview `supplementary.pdf`).
+      Re-compile on Overleaf with XeLaTeX + Noto for the final PDF.
 - [ ] If the MDPI submission form asks about prior submissions, answer honestly.
 
 ## Notes
