@@ -22,7 +22,15 @@
 % template this stays 'xetex' and the compiler is set to XeLaTeX.
 \documentclass[mathematics,article,submit,xetex,moreauthors]{Definitions/mdpi}
 
-% --- CJK support (a few Chinese/Japanese qualitative examples) -> needs XeLaTeX
+% --- Engine guard: THIS DOCUMENT MUST BE COMPILED WITH XeLaTeX ---------------
+% The qualitative examples contain Chinese/Japanese characters rendered via
+% xeCJK. If you compile with pdfLaTeX, those characters are silently dropped
+% (blank), which is a real bug. \RequireXeTeX makes a non-XeLaTeX compile stop
+% with a clear error instead, so a CJK-less PDF can never be submitted.
+% On Overleaf: Menu -> Compiler -> XeLaTeX.
+\usepackage{iftex}
+\RequireXeTeX
+% --- CJK support (a few Chinese/Japanese qualitative examples) ---------------
 \usepackage{xeCJK}
 \setCJKmainfont{Noto Serif CJK SC}
 
