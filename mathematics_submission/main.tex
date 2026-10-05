@@ -17,7 +17,10 @@
 %%=============================================================================
 
 % Use the MDPI Mathematics class (from the official template's Definitions/ folder)
-\documentclass[mathematics,article,submit,pdftex,moreauthors]{Definitions/mdpi}
+% NOTE: 'xetex' driver because the manuscript must be compiled with XeLaTeX
+% (xeCJK renders the Chinese/Japanese examples). On the current Overleaf MDPI
+% template this stays 'xetex' and the compiler is set to XeLaTeX.
+\documentclass[mathematics,article,submit,xetex,moreauthors]{Definitions/mdpi}
 
 % --- CJK support (a few Chinese/Japanese qualitative examples) -> needs XeLaTeX
 \usepackage{xeCJK}
