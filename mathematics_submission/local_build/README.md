@@ -24,7 +24,7 @@ TECTONIC=/data/home/qbao775/translation/texenv/bin/tectonic ./build.sh
 ```
 
 ## Important caveats (this is a PREVIEW)
-- The bundled `mdpi.cls` is an **older (2020)** mirror; the current Overleaf
+- The bundled `mdpi.cls` is a recent (2024) MDPI class mirror; the official Overleaf
   template is newer and renders `\TitleCitation`, `\institutionalreview`,
   `\informedconsent`, `\dataavailability` natively (here they are shimmed).
 - The **journal logo and CC-BY logo are placeholders**.
