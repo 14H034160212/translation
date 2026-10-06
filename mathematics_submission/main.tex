@@ -35,6 +35,10 @@
 \setCJKmainfont{Noto Serif CJK SC}
 
 % booktabs / graphicx / amsmath are already loaded by the MDPI class.
+% Allow TeX to absorb stubborn near-margin lines (narrow single column) rather
+% than overflowing into the margin.
+\setlength{\emergencystretch}{3em}
+\tolerance=2000
 
 %============================= Front matter ===================================
 % MDPI publication-metadata fields (required by the current MDPI class).
@@ -116,7 +120,7 @@ The contributions of this work are summarized as follows:
  \item We propose a complete end-to-end multimodal pipeline for short-drama subtitle processing, spanning recognition, translation, and speech synthesis---to our knowledge the first such comprehensive system for this domain.
  \item We conduct a systematic comparison of eight OCR backbones under controlled conditions, including traditional methods (RapidOCR~\cite{rapidocr2022}, EasyOCR~\cite{easyocr2020}, TrOCR~\cite{li2021trocr}) and recent VLMs (Qwen3-VL~\cite{qwen3vl2025}, Qwen2-VL~\cite{wang2024qwen2}, InternVL2~\cite{chen2024internvl}, GOT-OCR2.0~\cite{wang2024gotocr}, Florence-2~\cite{florence2_2024}), and we provide an ablation study on frame sampling rate.
  \item We introduce a two-parameter confidence-gated fusion strategy ($\theta_p$: ASR log-probability gate; $\theta_s$: OCR similarity gate) and select both parameters via a $10 \times 7$ grid search on a 20-episode validation subset (Supplementary Materials). The search reveals that the similarity gate $\theta_s$ is the primary design choice, while $\theta_p$ must be relaxed above $-0.8$ to activate any OCR correction. The full fusion system achieves a $+10.8\%$ improvement in composite score over the ASR-only baseline (Table~\ref{tab:fusion}).
- \item We construct a manually annotated Chinese--Japanese parallel subtitle dataset comprising 79 short-drama episodes, and we demonstrate that LoRA fine-tuning improves translation at \emph{every} model scale tested: Qwen3-VL-4B reaches cross-validated BLEU $15.70\pm4.42$ ($+25\%$ relative over its per-fold zero-shot mean), Qwen3-8B reaches $19.69\pm2.49$ ($+13\%$), and fine-tuning the strongest baseline Gemma-4-12B reaches $30.75\pm1.84$ ($+17\%$), the best overall, with all metrics computed via a standardised \texttt{strip\_nums}+\texttt{ja-mecab} protocol applied consistently to every model. We further show that visual frames help translation in zero-shot but provide no benefit once domain fine-tuning is applied.
+ \item We construct a manually annotated Chinese--Japanese parallel subtitle dataset comprising 79 short-drama episodes, and we demonstrate that LoRA fine-tuning improves translation at \emph{every} model scale tested: Qwen3-VL-4B reaches cross-validated BLEU $15.70\pm4.42$ ($+25\%$ relative over its per-fold zero-shot mean), Qwen3-8B reaches $19.69\pm2.49$ ($+13\%$), and fine-tuning the strongest baseline Gemma-4-12B reaches $30.75\pm1.84$ ($+17\%$), the best overall, with all metrics computed via a standardised \texttt{strip\_nums}\,+\,\allowbreak\texttt{ja-mecab} protocol applied consistently to every model. We further show that visual frames help translation in zero-shot but provide no benefit once domain fine-tuning is applied.
  \item We establish a comprehensive translation baseline of eleven configurations across ten models spanning multimodal VLMs (InternVL3-8B, Qwen3.5-9B, Gemma-4-12B, Qwen3-VL-4B), text-only LLMs (Qwen2.5-7B, Qwen3-8B~\cite{qwen3_2025}, Qwen2.5-3B), and dedicated MT models (M2M-100 1.2B~\cite{fan2021beyond}, SeamlessM4T-v2-large, NLLB-200), showing that domain-specific fine-tuning of a 4B model outperforms nine of eleven baselines on BLEU and chrF++.
  \item We conduct a jieba part-of-speech error analysis showing that the adaptive fusion disproportionately corrects proper nouns (60\% correction rate), and a cross-stage error-propagation study confirmed by a direct end-to-end evaluation showing fusion recovers $+2.24$ chrF++ (61\% of the oracle ceiling) over ASR-only on 16 held-out validation episodes.
  \item We benchmark four neural TTS systems for zero-shot Japanese voice cloning (GPT-SoVITS, CosyVoice2-0.5B, F5-TTS, EdgeTTS) with both automatic metrics and a blind five-rater human listening study (naturalness MOS and speaker-similarity preference), and provide an ablation study on the effect of reference audio duration on speaker similarity.
@@ -247,7 +251,7 @@ Each receives the Japanese text and, where applicable, a reference clip; outputs
 
 \subsection{Implementation Details}
 All experiments run on NVIDIA A100 80\,GB GPUs with Python~3.10, PyTorch, Hugging Face Transformers, and PEFT for LoRA (4-bit quantization following QLoRA); frames are extracted with OpenCV, OCR is served via a local vLLM instance (needed to keep 5\,fps tractable on one GPU), and ASR uses the Whisper-medium checkpoint~\cite{radford2023robust}.
-Translation metrics use SacreBLEU~\cite{post2018sacrebleu} v2.4.0 (signature \texttt{nrefs:1|case:mixed|tok:13a|smooth:exp}) and COMET (\texttt{wmt22-comet-da}); TTS evaluation transcribes generated audio with Whisper-medium and computes CER (character-level, NFKC-normalised, punctuation-stripped) and WER (over MeCab-tokenised text) via \texttt{jiwer}.
+Translation metrics use SacreBLEU~\cite{post2018sacrebleu} v2.4.0 (signature \texttt{nrefs:1|\allowbreak case:mixed|\allowbreak tok:13a|\allowbreak smooth:exp}) and COMET (\texttt{wmt22-comet-da}); TTS evaluation transcribes generated audio with Whisper-medium and computes CER (character-level, NFKC-normalised, punctuation-stripped) and WER (over MeCab-tokenised text) via \texttt{jiwer}.
 
 \subsection{Evaluation Metrics}
 \label{sec:metrics}
@@ -272,6 +276,7 @@ Table~\ref{tab:recognition} reports per-model recognition performance; all OCR r
 \centering
 \caption{Subtitle recognition performance. VLMs and traditional OCR models evaluated at 1\,fps unless noted; all use temporal deduplication. Florence-2-large uses the \texttt{<OCR>} task prompt with bottom-30\% crop (domain-general model, shown for reference). Whisper (ASR) listed separately. Best OCR/VLM results in bold.}
 \label{tab:recognition}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 \textbf{Model} & \textbf{Type} & \textbf{CER}$\downarrow$ & \textbf{CharAcc}$\uparrow$ & \textbf{BLEU}$\uparrow$ \\
@@ -288,7 +293,7 @@ Florence-2-large~\cite{florence2_2024} & VLM & 1.646 & 0.312 & 2.1 \\
 \midrule
 Whisper-medium~\cite{radford2023robust} & ASR & 0.249 & 0.783 & 81.3 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 At 1\,fps, the traditional \textbf{RapidOCR}~\cite{rapidocr2022} attains the best BLEU (86.3, CER 0.154) and \textbf{InternVL2-4B}~\cite{chen2024internvl} the best character accuracy (0.985, BLEU 83.5), showing that well-engineered traditional and VLM recognizers both excel on clean subtitle text.
@@ -326,6 +331,7 @@ The composite score improves by 0.079 (a relative gain of $+10.8\%$), primarily 
 \centering
 \caption{Adaptive multimodal fusion results. Composite score defined in Equation~\eqref{eq:composite}. Best results in bold.}
 \label{tab:fusion}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Configuration} & \textbf{BLEU}$\uparrow$ & \textbf{chrF++}$\uparrow$ & \textbf{CER}$\downarrow$ & \textbf{CharAcc}$\uparrow$ & \textbf{Comp.}$\uparrow$ \\
@@ -334,7 +340,7 @@ OCR Only    & 4.44 & 9.29 & 0.900 & 0.100 & 0.084 \\
 Whisper Only  & 81.32 & 57.64 & 0.249 & 0.783 & 0.731 \\
 Adaptive Fusion (ours) & \textbf{81.68} & \textbf{67.91} & \textbf{0.156} & \textbf{0.899} & \textbf{0.810} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{Gating-rule ablation under a unified harness.}
@@ -348,7 +354,7 @@ The system-level benefit of fusion over the ASR-only baseline ($+10.8\%$ composi
 
 \subsection{Subtitle Translation: Model Comparison}
 \label{sec:translation_results}
-Table~\ref{tab:translation} reports translation results; all BLEU/chrF++ use a standardised \texttt{strip\_nums}+\texttt{ja-mecab} protocol and are evaluated at the document level (full-episode input vs.\ full-episode reference), which avoids segment-alignment artefacts and matches the fine-tuned model's training.
+Table~\ref{tab:translation} reports translation results; all BLEU/chrF++ use a standardised \texttt{strip\_nums}\,+\,\allowbreak\texttt{ja-mecab} protocol and are evaluated at the document level (full-episode input vs.\ full-episode reference), which avoids segment-alignment artefacts and matches the fine-tuned model's training.
 Fine-tuned \textbf{Qwen3-VL-4B} reaches BLEU $15.70\pm4.42$ (5-fold CV), $+25\%$ over its per-fold zero-shot mean (12.61; Table~\ref{tab:per_fold}); it is statistically comparable to zero-shot \textbf{Qwen3-8B} (per-fold mean 17.41, $p=0.453$) at half the parameters.
 Fine-tuning \textbf{Qwen3-8B} reaches BLEU $19.69\pm2.49$ / COMET $0.860$ ($+2.28$ over its per-fold zero-shot mean), and fine-tuning the strongest baseline \textbf{Gemma-4-12B} reaches $30.75\pm1.84$ / chrF++ $30.63$ ($+4.51$ over its per-fold zero-shot mean 26.24), the best overall---so domain LoRA fine-tuning helps at every scale (4B $+25\%$, 8B $+13\%$, 12B $+17\%$).
 Gemma's COMET is essentially unchanged by fine-tuning ($0.890$ vs.\ $0.892$) despite the large surface-metric gain, suggesting fine-tuning mainly aligns lexical choice and register rather than meaning.
@@ -356,8 +362,9 @@ We make no single-model state-of-the-art claim: the translation-stage contributi
 
 \begin{table}[H]
 \centering
-\caption{Subtitle translation results. FT$^{\star}$ = LoRA fine-tuned (5-fold CV mean$\pm$std); ZS = zero-shot; +V = with visual frames. BLEU/chrF++ use \texttt{strip\_nums}+\texttt{ja-mecab}. Bold: best per column. $^{\ddagger}$Qwen2.5-3B ZS prepends phonetic speaker tags (COMET 0.71 stays high); $^{\S}$Qwen3.5-9B chain-of-thought exhausted the token budget before emitting Japanese.}
+\caption{Subtitle translation results. FT$^{\star}$ = LoRA fine-tuned (5-fold CV mean$\pm$std); ZS = zero-shot; +V = with visual frames. BLEU/chrF++ use \texttt{strip\_nums}\,+\,\allowbreak\texttt{ja-mecab}. Bold: best per column. $^{\ddagger}$Qwen2.5-3B ZS prepends phonetic speaker tags (COMET 0.71 stays high); $^{\S}$Qwen3.5-9B chain-of-thought exhausted the token budget before emitting Japanese.}
 \label{tab:translation}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llccc}
 \toprule
 \textbf{Model} & \textbf{Set.} & \textbf{BLEU}$\uparrow$ & \textbf{chrF++}$\uparrow$ & \textbf{COMET}$\uparrow$ \\
@@ -377,7 +384,7 @@ Qwen2.5-3B~\cite{yang2024qwen2}  & ZS   & 3.58$^{\ddagger}$ & 11.64 & 0.713 \\
 Qwen3.5-9B~\cite{qwen35_2025}    & ZS+V & 3.49$^{\S}$ & 11.79 & 0.420 \\
 NLLB-200~\cite{nllb2022}         & ZS   &  2.97 &  6.19 & 0.378 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \subsection{Text-to-Speech Comparison}
@@ -390,6 +397,7 @@ We use Resemblyzer~\cite{resemblyzer2020} as a lightweight offline speaker encod
 \centering
 \caption{TTS evaluation. Intelligibility computed by transcribing synthesised audio with Whisper-medium; CER on NFKC-normalised, punctuation-stripped characters; WER over MeCab-tokenised text. Mean and median CER both reported because the mean is inflated by degenerate outputs. Speaker similarity (Spk-Sim) is Resemblyzer embedding cosine; N/A for EdgeTTS (fixed voice). 12 speakers $\times$ 3 sentences ($n$\,=\,36); GPT-SoVITS over the 6 speakers with available synthesis ($n$\,=\,18). Best per column in bold; best among voice-cloning systems underlined. $^{\dagger}$EdgeTTS uses a fixed neural voice (\texttt{ja-JP-NanamiNeural}); speaker similarity not applicable. $^{\ddagger}$GPT-SoVITS averaged over the 6 speakers with available synthesis.}
 \label{tab:tts}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccc}
 \toprule
 \textbf{Model} & \textbf{Method} & \textbf{Avg.\ WER}$\downarrow$ & \textbf{Avg.\ CER}$\downarrow$ & \textbf{Med.\ CER}$\downarrow$ & \textbf{Spk-Sim}$\uparrow$ \\
@@ -399,7 +407,7 @@ GPT-SoVITS v3~\cite{gptsovits2024} & Zero-shot cloning  & \underline{0.248}$^{\d
 F5-TTS~\cite{chen2024f5tts}     & Flow matching (ZS)  & 0.998 & 1.152 & 1.000 & \textbf{0.729} \\
 CosyVoice2-0.5B~\cite{cosyvoice2_2024} & Flow matching (ZS) & 6.673 & 4.603 & 1.000 & 0.671 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{EdgeTTS}~\cite{edgetts2024}, with a fixed professionally tuned Japanese voice, is the most intelligible overall (CER 0.030, WER 0.056), as expected for a production service that performs no voice cloning.
@@ -449,8 +457,9 @@ Once LoRA adapts the model to the domain, text already carries most of the disam
 
 \begin{table}[H]
 \centering
-\caption{Per-fold BLEU on held-out validation episodes (5-fold CV, \texttt{strip\_nums}+\texttt{ja-mecab}, $n$\,=\,16/16/16/16/15). For each fold and for the mean, the best BLEU across all models (Gemma-4-12B FT) is in bold. FT+V denotes Qwen3-VL-4B fine-tuned with video frames as additional input. Qwen3-VL-4B text FT$>$ZS on Folds 0, 1, 3; ZS wins on Folds 2 and 4 (highest OOV). Gemma-4-12B FT$>$ZS on all five folds; Qwen3-8B FT$>$ZS on Folds 0, 1, 3, 4.}
+\caption{Per-fold BLEU on held-out validation episodes (5-fold CV, \texttt{strip\_nums}\,+\,\allowbreak\texttt{ja-mecab}, $n$\,=\,16/16/16/16/15). For each fold and for the mean, the best BLEU across all models (Gemma-4-12B FT) is in bold. FT+V denotes Qwen3-VL-4B fine-tuned with video frames as additional input. Qwen3-VL-4B text FT$>$ZS on Folds 0, 1, 3; ZS wins on Folds 2 and 4 (highest OOV). Gemma-4-12B FT$>$ZS on all five folds; Qwen3-8B FT$>$ZS on Folds 0, 1, 3, 4.}
 \label{tab:per_fold}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lcccccc}
 \toprule
 \textbf{Model} & \textbf{Fold 0} & \textbf{Fold 1} & \textbf{Fold 2} & \textbf{Fold 3} & \textbf{Fold 4} & \textbf{Mean$\pm$Std} \\
@@ -464,7 +473,7 @@ Gemma-4-12B ZS           & 25.69 & 24.96 & 27.57 & 26.38 & 26.59 & $26.24_{\pm0.
 Qwen3-8B ZS              & 17.82 & 18.00 & 18.01 & 15.64 & 17.58 & $17.41_{\pm1.00}$ \\
 Qwen3-8B FT (ours)       & 20.48 & 23.49 & 17.53 & 17.45 & 19.51 & $19.69_{\pm2.49}$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \subsubsection{TTS Reference Audio Duration}
