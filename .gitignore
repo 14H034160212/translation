@@ -59,3 +59,15 @@ venv_chattts/
 speech2text/frames_cache_hybrid/
 speech2text/qwenvl_cache_hybrid_no_post_3090/
 baseline_results/adaptive_fusion_final/
+
+# Listening study: raw export contains rater names; notes contain the survey admin key.
+# Only the anonymised CSVs (listening_*_anonymized.csv) are published.
+human_eval/mos_results_raw.csv
+human_eval/mos_analysis_summary.md
+human_eval/stimuli/
+# Licensed corpus material and cloned voices (no redistribution)
+tts_results/
+tts_results_f5tts/
+*.mp3
+*.doc
+*.docx

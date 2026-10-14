@@ -1,0 +1,476 @@
+{
+  "GPT-SoVITS v3": {
+    "mean_similarity": 0.7222681310441759,
+    "std_similarity": 0.056674233229732515,
+    "n_samples": 18,
+    "n_speakers": 6,
+    "details": [
+      {
+        "speaker": 1,
+        "sentence": 0,
+        "similarity": 0.7698860764503479
+      },
+      {
+        "speaker": 1,
+        "sentence": 1,
+        "similarity": 0.7499170899391174
+      },
+      {
+        "speaker": 1,
+        "sentence": 2,
+        "similarity": 0.811011552810669
+      },
+      {
+        "speaker": 2,
+        "sentence": 0,
+        "similarity": 0.731204628944397
+      },
+      {
+        "speaker": 2,
+        "sentence": 1,
+        "similarity": 0.7587006092071533
+      },
+      {
+        "speaker": 2,
+        "sentence": 2,
+        "similarity": 0.7190845608711243
+      },
+      {
+        "speaker": 3,
+        "sentence": 0,
+        "similarity": 0.6874054670333862
+      },
+      {
+        "speaker": 3,
+        "sentence": 1,
+        "similarity": 0.6255829930305481
+      },
+      {
+        "speaker": 3,
+        "sentence": 2,
+        "similarity": 0.6220052242279053
+      },
+      {
+        "speaker": 4,
+        "sentence": 0,
+        "similarity": 0.7407621741294861
+      },
+      {
+        "speaker": 4,
+        "sentence": 1,
+        "similarity": 0.7266555428504944
+      },
+      {
+        "speaker": 4,
+        "sentence": 2,
+        "similarity": 0.7222611904144287
+      },
+      {
+        "speaker": 7,
+        "sentence": 0,
+        "similarity": 0.6561070680618286
+      },
+      {
+        "speaker": 7,
+        "sentence": 1,
+        "similarity": 0.7451356649398804
+      },
+      {
+        "speaker": 7,
+        "sentence": 2,
+        "similarity": 0.620894193649292
+      },
+      {
+        "speaker": 8,
+        "sentence": 0,
+        "similarity": 0.7340453863143921
+      },
+      {
+        "speaker": 8,
+        "sentence": 1,
+        "similarity": 0.7901415824890137
+      },
+      {
+        "speaker": 8,
+        "sentence": 2,
+        "similarity": 0.7900253534317017
+      }
+    ]
+  },
+  "F5-TTS": {
+    "mean_similarity": 0.728678779469596,
+    "std_similarity": 0.04790549430429187,
+    "n_samples": 36,
+    "n_speakers": 12,
+    "details": [
+      {
+        "speaker": 1,
+        "sentence": 0,
+        "similarity": 0.8041532635688782
+      },
+      {
+        "speaker": 1,
+        "sentence": 1,
+        "similarity": 0.6856479644775391
+      },
+      {
+        "speaker": 1,
+        "sentence": 2,
+        "similarity": 0.6995048522949219
+      },
+      {
+        "speaker": 2,
+        "sentence": 0,
+        "similarity": 0.73451828956604
+      },
+      {
+        "speaker": 2,
+        "sentence": 1,
+        "similarity": 0.7392774224281311
+      },
+      {
+        "speaker": 2,
+        "sentence": 2,
+        "similarity": 0.6740515232086182
+      },
+      {
+        "speaker": 3,
+        "sentence": 0,
+        "similarity": 0.717822790145874
+      },
+      {
+        "speaker": 3,
+        "sentence": 1,
+        "similarity": 0.721713662147522
+      },
+      {
+        "speaker": 3,
+        "sentence": 2,
+        "similarity": 0.6857776641845703
+      },
+      {
+        "speaker": 4,
+        "sentence": 0,
+        "similarity": 0.6908420920372009
+      },
+      {
+        "speaker": 4,
+        "sentence": 1,
+        "similarity": 0.7014287710189819
+      },
+      {
+        "speaker": 4,
+        "sentence": 2,
+        "similarity": 0.6898126006126404
+      },
+      {
+        "speaker": 5,
+        "sentence": 0,
+        "similarity": 0.6693696975708008
+      },
+      {
+        "speaker": 5,
+        "sentence": 1,
+        "similarity": 0.6463565230369568
+      },
+      {
+        "speaker": 5,
+        "sentence": 2,
+        "similarity": 0.7216124534606934
+      },
+      {
+        "speaker": 6,
+        "sentence": 0,
+        "similarity": 0.6679747700691223
+      },
+      {
+        "speaker": 6,
+        "sentence": 1,
+        "similarity": 0.7365044951438904
+      },
+      {
+        "speaker": 6,
+        "sentence": 2,
+        "similarity": 0.6949467658996582
+      },
+      {
+        "speaker": 7,
+        "sentence": 0,
+        "similarity": 0.7775275707244873
+      },
+      {
+        "speaker": 7,
+        "sentence": 1,
+        "similarity": 0.7764893770217896
+      },
+      {
+        "speaker": 7,
+        "sentence": 2,
+        "similarity": 0.7162572145462036
+      },
+      {
+        "speaker": 8,
+        "sentence": 0,
+        "similarity": 0.7544614672660828
+      },
+      {
+        "speaker": 8,
+        "sentence": 1,
+        "similarity": 0.6800159215927124
+      },
+      {
+        "speaker": 8,
+        "sentence": 2,
+        "similarity": 0.6984035968780518
+      },
+      {
+        "speaker": 9,
+        "sentence": 0,
+        "similarity": 0.8398004174232483
+      },
+      {
+        "speaker": 9,
+        "sentence": 1,
+        "similarity": 0.8054506778717041
+      },
+      {
+        "speaker": 9,
+        "sentence": 2,
+        "similarity": 0.7633612751960754
+      },
+      {
+        "speaker": 10,
+        "sentence": 0,
+        "similarity": 0.7487050294876099
+      },
+      {
+        "speaker": 10,
+        "sentence": 1,
+        "similarity": 0.8102490305900574
+      },
+      {
+        "speaker": 10,
+        "sentence": 2,
+        "similarity": 0.7337877750396729
+      },
+      {
+        "speaker": 11,
+        "sentence": 0,
+        "similarity": 0.669268012046814
+      },
+      {
+        "speaker": 11,
+        "sentence": 1,
+        "similarity": 0.7519144415855408
+      },
+      {
+        "speaker": 11,
+        "sentence": 2,
+        "similarity": 0.6849654316902161
+      },
+      {
+        "speaker": 12,
+        "sentence": 0,
+        "similarity": 0.757003664970398
+      },
+      {
+        "speaker": 12,
+        "sentence": 1,
+        "similarity": 0.7998796105384827
+      },
+      {
+        "speaker": 12,
+        "sentence": 2,
+        "similarity": 0.78357994556427
+      }
+    ]
+  },
+  "CosyVoice2-0.5B": {
+    "mean_similarity": 0.6706356969144609,
+    "std_similarity": 0.06111375443790255,
+    "n_samples": 36,
+    "n_speakers": 12,
+    "details": [
+      {
+        "speaker": 1,
+        "sentence": 0,
+        "similarity": 0.64610755443573
+      },
+      {
+        "speaker": 1,
+        "sentence": 1,
+        "similarity": 0.6500595211982727
+      },
+      {
+        "speaker": 1,
+        "sentence": 2,
+        "similarity": 0.6748107671737671
+      },
+      {
+        "speaker": 2,
+        "sentence": 0,
+        "similarity": 0.6338907480239868
+      },
+      {
+        "speaker": 2,
+        "sentence": 1,
+        "similarity": 0.5964165329933167
+      },
+      {
+        "speaker": 2,
+        "sentence": 2,
+        "similarity": 0.5919362306594849
+      },
+      {
+        "speaker": 3,
+        "sentence": 0,
+        "similarity": 0.6389972567558289
+      },
+      {
+        "speaker": 3,
+        "sentence": 1,
+        "similarity": 0.6339465975761414
+      },
+      {
+        "speaker": 3,
+        "sentence": 2,
+        "similarity": 0.6769025325775146
+      },
+      {
+        "speaker": 4,
+        "sentence": 0,
+        "similarity": 0.6388211846351624
+      },
+      {
+        "speaker": 4,
+        "sentence": 1,
+        "similarity": 0.6670258045196533
+      },
+      {
+        "speaker": 4,
+        "sentence": 2,
+        "similarity": 0.6381562948226929
+      },
+      {
+        "speaker": 5,
+        "sentence": 0,
+        "similarity": 0.7225720286369324
+      },
+      {
+        "speaker": 5,
+        "sentence": 1,
+        "similarity": 0.7141889333724976
+      },
+      {
+        "speaker": 5,
+        "sentence": 2,
+        "similarity": 0.7311099767684937
+      },
+      {
+        "speaker": 6,
+        "sentence": 0,
+        "similarity": 0.6658260822296143
+      },
+      {
+        "speaker": 6,
+        "sentence": 1,
+        "similarity": 0.6521579623222351
+      },
+      {
+        "speaker": 6,
+        "sentence": 2,
+        "similarity": 0.7021204829216003
+      },
+      {
+        "speaker": 7,
+        "sentence": 0,
+        "similarity": 0.658454418182373
+      },
+      {
+        "speaker": 7,
+        "sentence": 1,
+        "similarity": 0.6051747798919678
+      },
+      {
+        "speaker": 7,
+        "sentence": 2,
+        "similarity": 0.660414457321167
+      },
+      {
+        "speaker": 8,
+        "sentence": 0,
+        "similarity": 0.7279900908470154
+      },
+      {
+        "speaker": 8,
+        "sentence": 1,
+        "similarity": 0.7473308444023132
+      },
+      {
+        "speaker": 8,
+        "sentence": 2,
+        "similarity": 0.7547404170036316
+      },
+      {
+        "speaker": 9,
+        "sentence": 0,
+        "similarity": 0.7215391993522644
+      },
+      {
+        "speaker": 9,
+        "sentence": 1,
+        "similarity": 0.7590525150299072
+      },
+      {
+        "speaker": 9,
+        "sentence": 2,
+        "similarity": 0.7665347456932068
+      },
+      {
+        "speaker": 10,
+        "sentence": 0,
+        "similarity": 0.6877589225769043
+      },
+      {
+        "speaker": 10,
+        "sentence": 1,
+        "similarity": 0.6819632053375244
+      },
+      {
+        "speaker": 10,
+        "sentence": 2,
+        "similarity": 0.705269992351532
+      },
+      {
+        "speaker": 11,
+        "sentence": 0,
+        "similarity": 0.5285328030586243
+      },
+      {
+        "speaker": 11,
+        "sentence": 1,
+        "similarity": 0.5533233880996704
+      },
+      {
+        "speaker": 11,
+        "sentence": 2,
+        "similarity": 0.5273961424827576
+      },
+      {
+        "speaker": 12,
+        "sentence": 0,
+        "similarity": 0.7354119420051575
+      },
+      {
+        "speaker": 12,
+        "sentence": 1,
+        "similarity": 0.7270101308822632
+      },
+      {
+        "speaker": 12,
+        "sentence": 2,
+        "similarity": 0.7199406027793884
+      }
+    ]
+  }
+}

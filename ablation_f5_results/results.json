@@ -1,0 +1,12 @@
+[
+    {
+        "condition": "short",
+        "ref_length": "3s",
+        "similarity": 0.6411981582641602
+    },
+    {
+        "condition": "long",
+        "ref_length": "10s",
+        "similarity": 0.7054751515388489
+    }
+]
